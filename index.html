@@ -520,26 +520,65 @@
     /* ───────── Unsaved warning strip ───────── */
     .unsaved-strip {
       display: none;
-      align-items: center; justify-content: center; gap: 12px;
-      background: rgba(251,191,36,.08);
-      border-top: 1px solid rgba(251,191,36,.25);
-      padding: 10px 24px;
-      color: var(--tent-fg);
-      font-size: 14px; font-weight: 600;
-      letter-spacing: .01em;
+      align-items: center; justify-content: center; gap: 14px;
+      background: linear-gradient(90deg,
+        rgba(251,191,36,.28) 0%,
+        rgba(251,146,60,.28) 50%,
+        rgba(251,191,36,.28) 100%);
+      background-size: 200% 100%;
+      border-top: 2px solid var(--tent-fg);
+      border-bottom: 1px solid rgba(251,191,36,.4);
+      padding: 14px 24px;
+      color: #fbbf24;
+      font-size: 16px; font-weight: 700;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+      animation: strip-shimmer 3s linear infinite;
     }
-    .unsaved-strip.show { display: flex; }
-    .unsaved-strip.err  { background: rgba(251,113,133,.08); border-top-color: rgba(251,113,133,.3); color: var(--danger); }
+    .unsaved-strip.show { display: flex; animation: strip-shimmer 3s linear infinite, strip-intro .4s var(--ease); }
+    .unsaved-strip.err  {
+      background: linear-gradient(90deg, rgba(251,113,133,.28), rgba(239,68,68,.28), rgba(251,113,133,.28));
+      border-top-color: var(--danger); border-bottom-color: rgba(251,113,133,.4);
+      color: var(--danger);
+    }
+    @keyframes strip-shimmer {
+      0%   { background-position:   0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+    @keyframes strip-intro {
+      from { transform: translateY(-100%); opacity: 0; }
+      to   { transform: translateY(0);     opacity: 1; }
+    }
+    .unsaved-icon {
+      width: 22px; height: 22px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      animation: icon-wobble 2s ease-in-out infinite;
+    }
+    @keyframes icon-wobble {
+      0%, 100% { transform: rotate(0);    }
+      25%      { transform: rotate(-10deg); }
+      75%      { transform: rotate(10deg);  }
+    }
     .unsaved-dot {
-      width: 10px; height: 10px; border-radius: 50%;
+      width: 12px; height: 12px; border-radius: 50%;
       background: currentColor;
       box-shadow: 0 0 0 0 currentColor;
-      animation: dirty-pulse 1.6s var(--ease) infinite;
+      animation: dirty-pulse 1.4s var(--ease) infinite;
     }
     @keyframes dirty-pulse {
-      0%   { box-shadow: 0 0 0 0   rgba(251,191,36,.55); }
-      60%  { box-shadow: 0 0 0 9px rgba(251,191,36,0); }
+      0%   { box-shadow: 0 0 0 0   rgba(251,191,36,.7); }
+      60%  { box-shadow: 0 0 0 14px rgba(251,191,36,0); }
       100% { box-shadow: 0 0 0 0   rgba(251,191,36,0); }
+    }
+
+    /* Save button urgency when dirty */
+    body.is-dirty .btn-dark {
+      animation: save-btn-pulse 1.6s var(--ease) infinite;
+    }
+    @keyframes save-btn-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(251,191,36,.65), 0 0 0 0 rgba(251,191,36,.5); }
+      50%      { box-shadow: 0 0 0 8px rgba(251,191,36,0), 0 0 30px rgba(251,191,36,.4); }
     }
 
     /* ───────── Save confirmation (big center checkmark) ───────── */
@@ -703,6 +742,7 @@
     </div>
   </div>
   <div class="unsaved-strip" id="unsavedStrip">
+    <span class="unsaved-icon">⚠</span>
     <span class="unsaved-dot"></span>
     <span class="unsaved-text">Unsaved changes</span>
   </div>
@@ -1016,6 +1056,7 @@
     const text = el?.querySelector('.unsaved-text');
     if (!el) return;
     el.classList.remove('show', 'err');
+    document.body.classList.toggle('is-dirty', s === 'dirty' || s === 'saving' || s === 'err');
     if (s === 'dirty')  { el.classList.add('show'); text.textContent = 'Unsaved changes'; }
     else if (s === 'saving') { el.classList.add('show'); text.textContent = 'Saving…'; }
     else if (s === 'err')    { el.classList.add('show', 'err'); text.textContent = 'Save failed — will retry'; }
