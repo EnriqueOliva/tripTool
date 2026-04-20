@@ -7,74 +7,72 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      /* Canvas — dark, cool, modern */
+      /* Canvas */
       --bg: #0b0b12;
-      --bg-grad: radial-gradient(900px 500px at 12% -5%, rgba(139,92,246,.22) 0%, transparent 60%),
-                 radial-gradient(900px 520px at 100% 8%, rgba(34,211,238,.16) 0%, transparent 55%),
-                 radial-gradient(700px 400px at 50% 120%, rgba(244,114,182,.09) 0%, transparent 60%),
+      --bg-grad: radial-gradient(900px 500px at 10% -5%, rgba(139,92,246,.22) 0%, transparent 60%),
+                 radial-gradient(900px 520px at 100% 10%, rgba(34,211,238,.15) 0%, transparent 55%),
+                 radial-gradient(700px 400px at 50% 120%, rgba(244,114,182,.10) 0%, transparent 60%),
                  #0b0b12;
-      --surface:    #141420;
-      --surface-2:  #1a1a2a;
-      --surface-3:  #212134;
-      --border:     #262639;
-      --border-2:   #363652;
+      --surface:   #141420;
+      --surface-2: #1a1a2a;
+      --surface-3: #212134;
+      --border:    #262639;
+      --border-2:  #363652;
 
       /* Text */
       --text:   #f3f3f8;
-      --text-2: #a3a3b8;
+      --text-2: #a5a5bc;
       --text-3: #6a6a82;
 
-      /* Brand accents */
-      --day:            #a78bfa;
-      --day-soft:       rgba(167,139,250,.14);
-      --day-ring:       rgba(167,139,250,.28);
-      --transport:      #22d3ee;
-      --transport-soft: rgba(34,211,238,.12);
-      --transport-ring: rgba(34,211,238,.26);
+      /* Card types */
+      --activity:      #a78bfa;   /* violet */
+      --activity-soft: rgba(167,139,250,.14);
+      --activity-ring: rgba(167,139,250,.28);
+      --transport:     #22d3ee;   /* cyan */
+      --transport-soft:rgba(34,211,238,.12);
+      --transport-ring:rgba(34,211,238,.26);
+      --hotel:         #f472b6;   /* pink */
+      --hotel-soft:    rgba(244,114,182,.13);
+      --hotel-ring:    rgba(244,114,182,.28);
 
       /* Status */
-      --idea-bg: rgba(255,255,255,.06); --idea-fg: #a3a3b8;
+      --idea-bg: rgba(255,255,255,.06); --idea-fg: #a5a5bc;
       --tent-bg: rgba(251,191,36,.14);  --tent-fg: #fbbf24;
       --book-bg: rgba(74,222,128,.13);  --book-fg: #4ade80;
 
-      /* Danger / error */
       --danger:    #fb7185;
       --danger-bg: rgba(251,113,133,.12);
 
-      /* Radii & depth */
       --r-lg: 18px;
       --r-md: 12px;
       --r-sm: 8px;
       --shadow-sm: 0 1px 2px rgba(0,0,0,.45), 0 2px 8px rgba(0,0,0,.35);
       --shadow-md: 0 8px 24px rgba(0,0,0,.45), 0 2px 4px rgba(0,0,0,.35);
       --shadow-lg: 0 20px 60px rgba(0,0,0,.55), 0 10px 20px rgba(0,0,0,.4);
-
-      /* Motion */
       --ease: cubic-bezier(.2,.7,.2,1);
     }
 
-    * , *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { color-scheme: dark; }
     html, body { height: 100%; }
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
-      font-size: 16px;
+      font-size: 17px;
       background: var(--bg-grad);
       color: var(--text);
       line-height: 1.55;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
+    body.loading { overflow: hidden; }
+    ::selection { background: var(--activity); color: #0b0b12; }
 
-    ::selection { background: var(--day); color: #fff; }
-
-    /* ───────── Header ───────── */
+    /* ───────── Topbar ───────── */
     .topbar {
       position: sticky; top: 0; z-index: 50;
       background: rgba(11,11,18,.72);
@@ -83,27 +81,28 @@
       border-bottom: 1px solid rgba(38,38,57,.8);
     }
     .topbar-inner {
-      max-width: 920px; margin: 0 auto;
-      padding: 14px 24px;
+      max-width: 960px; margin: 0 auto;
+      padding: 16px 24px;
       display: flex; align-items: center; justify-content: space-between; gap: 16px;
     }
     .brand { display: flex; flex-direction: column; min-width: 0; }
     .brand-title {
-      font-family: 'Inter', sans-serif;
-      font-size: 30px; font-weight: 600; letter-spacing: -0.02em;
+      font-family: inherit;
+      font-size: 34px; font-weight: 700; letter-spacing: -0.025em;
       color: var(--text); border: none; background: transparent; outline: none;
-      padding: 0; width: 100%; max-width: 460px;
+      padding: 0; width: 100%; max-width: 480px;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .brand-title:focus { color: var(--day); }
-    .brand-meta { font-size: 13px; color: var(--text-3); letter-spacing: .01em; margin-top: 3px; }
+    .brand-title:focus { color: var(--activity); }
+    .brand-meta { font-size: 14px; color: var(--text-3); letter-spacing: .01em; margin-top: 2px; }
 
     .toolbar { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
+    /* ───────── Buttons ───────── */
     .btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 9px 16px; border-radius: 999px;
-      font: 500 14px/1 'Inter', sans-serif;
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 10px 18px; border-radius: 999px;
+      font: 600 15px/1 'Inter', sans-serif;
       cursor: pointer; border: 1px solid transparent;
       transition: transform .15s var(--ease), background .15s, color .15s, border-color .15s, box-shadow .15s;
       white-space: nowrap;
@@ -112,116 +111,161 @@
     .btn:active { transform: translateY(0); }
     .btn[disabled] { opacity: .38; cursor: not-allowed; transform: none; }
     .btn-dark {
-      background: linear-gradient(135deg, var(--day) 0%, var(--transport) 100%);
+      background: linear-gradient(135deg, var(--activity) 0%, var(--transport) 100%);
       color: #0b0b12;
-      font-weight: 600;
     }
-    .btn-dark:hover { box-shadow: 0 0 0 4px var(--day-ring), var(--shadow-md); }
+    .btn-dark:hover { box-shadow: 0 0 0 4px var(--activity-ring), var(--shadow-md); }
     .btn-ghost { background: transparent; color: var(--text-2); border-color: var(--border); }
     .btn-ghost:hover { background: var(--surface-2); color: var(--text); border-color: var(--border-2); }
-    .btn-tiny { padding: 6px 10px; font-size: 13px; border-radius: 8px; background: transparent; color: var(--text-3); border-color: transparent; }
+    .btn-tiny {
+      padding: 7px 11px; font-size: 14px; border-radius: 8px;
+      background: transparent; color: var(--text-3); border-color: transparent;
+    }
     .btn-tiny:hover { background: var(--surface-2); color: var(--text); transform: none; }
     .btn-tiny.danger:hover { background: var(--danger-bg); color: var(--danger); }
 
     .status {
-      font-size: 13px; color: var(--text-3);
+      font-size: 14px; color: var(--text-3);
       display: inline-flex; align-items: center; gap: 6px;
-      min-width: 82px; padding: 0 4px;
+      min-width: 86px; padding: 0 4px;
       transition: color .15s;
     }
-    .status.saving { color: var(--day); }
+    .status.saving { color: var(--activity); }
     .status.saved  { color: var(--book-fg); }
     .status.err    { color: var(--danger); }
 
-    /* ───────── Timeline ───────── */
-    .stage {
-      max-width: 880px; margin: 0 auto;
-      padding: 56px 24px 120px;
-      position: relative;
+    /* ───────── Trip range picker ───────── */
+    .range-bar {
+      max-width: 960px; margin: 0 auto;
+      padding: 32px 24px 0;
+      display: flex; align-items: center; gap: 14px;
+      flex-wrap: wrap;
     }
+    .range-label {
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .14em;
+      color: var(--text-3);
+    }
+    .range-picker {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border-2);
+      border-radius: 999px;
+      padding: 6px 10px;
+    }
+    .range-date-wrap { position: relative; display: inline-flex; }
+    .range-date {
+      font: 600 16px/1 'Inter', sans-serif;
+      color: var(--text);
+      background: transparent; border: none; outline: none;
+      padding: 8px 14px; border-radius: 999px;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .range-date:hover { background: var(--surface-2); color: var(--activity); }
+    .range-date.empty { color: var(--text-3); font-weight: 500; font-style: italic; }
+    .range-arrow { color: var(--text-3); font-size: 16px; }
+    .range-date-hidden {
+      position: absolute; left: 0; top: 0;
+      width: 1px; height: 1px;
+      opacity: 0; pointer-events: none;
+      border: none; padding: 0; margin: 0;
+    }
+
+    /* ───────── Main stage ───────── */
+    .stage { max-width: 960px; margin: 0 auto; padding: 28px 24px 140px; }
 
     .intro {
-      margin-bottom: 48px;
-      font-family: 'Inter', sans-serif;
-      font-weight: 400;
+      margin-bottom: 40px;
       color: var(--text-2);
-      font-size: 25px;
-      line-height: 1.35;
-      letter-spacing: -0.015em;
-      padding-left: 76px;
-      max-width: 620px;
-    }
-    .intro .accent {
-      background: linear-gradient(90deg, var(--day), var(--transport));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      font-weight: 500;
+      font-size: 19px;
+      line-height: 1.55;
+      max-width: 640px;
     }
 
-    .tl {
-      position: relative;
-    }
+    /* ───────── Day blocks ───────── */
+    .days { display: flex; flex-direction: column; gap: 42px; position: relative; }
 
-    /* The vertical spine */
-    .tl::before {
+    /* A faint spine connecting all day headers */
+    .days::before {
       content: "";
       position: absolute;
-      left: 36px; top: -8px; bottom: -8px;
+      left: 24px; top: 18px; bottom: 18px;
       width: 2px;
       background: linear-gradient(
         to bottom,
         transparent 0%,
-        rgba(167,139,250,.6) 6%,
-        rgba(167,139,250,.45) 30%,
-        rgba(34,211,238,.4) 70%,
-        rgba(34,211,238,.55) 94%,
+        rgba(167,139,250,.45) 6%,
+        rgba(34,211,238,.35) 94%,
         transparent 100%
       );
       border-radius: 2px;
+      pointer-events: none;
     }
 
-    .tl-item {
+    .day-block {
       position: relative;
-      padding: 4px 0 4px 76px;
-      margin-bottom: 22px;
-      opacity: 0;
-      transform: translateY(12px);
+      opacity: 0; transform: translateY(14px);
       transition: opacity .35s var(--ease), transform .35s var(--ease);
     }
-    .tl-item.visible { opacity: 1; transform: translateY(0); }
+    .day-block.visible { opacity: 1; transform: translateY(0); }
 
-    /* Node on the spine */
-    .tl-node {
-      position: absolute;
-      left: 24px; top: 22px;
-      width: 26px; height: 26px;
+    /* Day header */
+    .day-header {
+      position: relative;
+      padding: 18px 20px 18px 72px;
+      background: var(--surface);
+      border: 1px solid var(--border-2);
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow-sm);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      flex-wrap: wrap;
+    }
+    .day-header-main { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+
+    .day-dot {
+      position: absolute; left: 14px; top: 50%;
+      transform: translateY(-50%);
+      width: 22px; height: 22px;
       border-radius: 50%;
       background: var(--surface);
-      display: grid; place-items: center;
-      font-size: 12px;
-      z-index: 1;
-      transition: box-shadow .25s var(--ease), transform .25s var(--ease);
+      border: 2px solid var(--activity);
+      box-shadow: 0 0 0 6px var(--activity-ring);
     }
-    .tl-item .tl-node {
-      border: 2px solid var(--day);
-      box-shadow: 0 0 0 6px var(--day-ring);
+    .day-num {
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .18em;
+      color: var(--text-3);
     }
-    .tl-item.has-transport .tl-node {
-      border: 2px solid var(--transport);
-      box-shadow: 0 0 0 6px var(--transport-ring);
-      font-size: 13px;
+    .day-title {
+      font-size: 26px; font-weight: 700; letter-spacing: -0.02em;
+      color: var(--text);
     }
-    .tl-item:hover .tl-node { transform: scale(1.08); }
+    .day-weekday {
+      font-size: 14px; font-weight: 600; color: var(--activity);
+      margin-right: 8px;
+    }
+    .day-count {
+      font-size: 13px; color: var(--text-3);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 5px 11px; border-radius: 999px;
+      flex-shrink: 0;
+    }
 
-    /* Card */
+    /* Cards within a day */
+    .day-cards {
+      display: flex; flex-direction: column; gap: 10px;
+      padding: 14px 0 14px 56px;
+    }
+
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--r-lg);
       box-shadow: var(--shadow-sm);
       overflow: hidden;
-      transition: box-shadow .25s var(--ease), transform .25s var(--ease), border-color .25s;
+      transition: box-shadow .25s var(--ease), border-color .25s;
     }
     .card:hover { box-shadow: var(--shadow-md); border-color: var(--border-2); }
 
@@ -230,28 +274,21 @@
       padding: 14px 18px;
       border-bottom: 1px solid var(--border);
     }
-    .card-head { background: linear-gradient(180deg, var(--day-soft) 0%, transparent 100%); }
-    .tl-item.has-transport .card-head {
-      background: linear-gradient(135deg, var(--day-soft) 0%, var(--transport-soft) 100%);
-    }
+    .card.type-activity  .card-head { background: linear-gradient(180deg, var(--activity-soft)  0%, transparent 100%); }
+    .card.type-transport .card-head { background: linear-gradient(180deg, var(--transport-soft) 0%, transparent 100%); }
+    .card.type-hotel     .card-head { background: linear-gradient(180deg, var(--hotel-soft)     0%, transparent 100%); }
 
-    .date-wrap { position: relative; display: inline-flex; }
-    .head-date {
-      font-family: 'Inter', sans-serif;
-      font-size: 15px; font-weight: 600; color: var(--text);
-      border: none; background: transparent; outline: none;
-      padding: 5px 12px; cursor: pointer; border-radius: 8px;
-      flex: 0 0 auto;
-      transition: background .15s, color .15s;
+    .type-pill {
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .12em;
+      padding: 5px 11px; border-radius: 999px;
+      display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.03);
     }
-    .head-date:hover { background: rgba(255,255,255,.06); color: var(--day); }
-    .head-date.empty { color: var(--text-3); font-weight: 500; font-style: italic; }
-    .head-date-hidden {
-      position: absolute; left: 0; top: 0;
-      width: 1px; height: 1px;
-      opacity: 0; pointer-events: none;
-      border: none; padding: 0; margin: 0;
-    }
+    .card.type-activity  .type-pill { color: var(--activity); }
+    .card.type-transport .type-pill { color: var(--transport); }
+    .card.type-hotel     .type-pill { color: var(--hotel); }
 
     .head-right {
       margin-left: auto;
@@ -260,7 +297,7 @@
     }
 
     .badge {
-      font-size: 11px; font-weight: 700;
+      font-size: 12px; font-weight: 700;
       text-transform: uppercase; letter-spacing: .1em;
       padding: 5px 12px; border-radius: 999px;
       border: none; outline: none; cursor: pointer;
@@ -271,84 +308,6 @@
     .badge-tentative { background: var(--tent-bg); color: var(--tent-fg); }
     .badge-booked    { background: var(--book-bg); color: var(--book-fg); }
 
-    .card-body {
-      padding: 16px 18px 18px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px 20px;
-    }
-    .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-    .field.span2 { grid-column: 1 / -1; }
-    .label {
-      font-size: 11px; font-weight: 600;
-      text-transform: uppercase; letter-spacing: .11em;
-      color: var(--text-3);
-    }
-    .inp {
-      font: 400 16px/1.5 'Inter', sans-serif;
-      color: var(--text);
-      border: none;
-      border-bottom: 1.5px solid transparent;
-      background: transparent;
-      outline: none; padding: 4px 0;
-      width: 100%; min-width: 0;
-      transition: border-color .15s;
-    }
-    .inp:focus { border-bottom-color: var(--day); }
-    .transport .inp:focus { border-bottom-color: var(--transport); }
-    .inp::placeholder { color: var(--text-3); }
-    textarea.inp { resize: none; min-height: 40px; line-height: 1.55; font-family: inherit; }
-
-    /* ── Transport sub-section ── */
-    .transport {
-      border-top: 1px dashed var(--border-2);
-      background: linear-gradient(180deg, transparent 0%, var(--transport-soft) 100%);
-    }
-    .transport-head {
-      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-      padding: 12px 18px 4px;
-    }
-    .transport-label {
-      font-size: 12px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: .14em;
-      color: var(--transport);
-      display: inline-flex; align-items: center; gap: 7px;
-    }
-    .transport-label::before {
-      content: "";
-      display: inline-block; width: 6px; height: 6px; border-radius: 50%;
-      background: var(--transport);
-      box-shadow: 0 0 0 3px var(--transport-ring);
-    }
-    .transport-remove {
-      margin-left: auto;
-      font-size: 12px; color: var(--text-3);
-      background: transparent; border: none; cursor: pointer;
-      padding: 5px 10px; border-radius: 6px;
-      font-family: inherit;
-    }
-    .transport-remove:hover { color: var(--danger); background: var(--danger-bg); }
-
-    /* Toggle button — shown when transport isn't added yet */
-    .transport-toggle {
-      display: inline-flex; align-items: center; gap: 7px;
-      margin: 10px 18px 18px;
-      padding: 10px 16px;
-      background: transparent;
-      border: 1px dashed var(--border-2);
-      border-radius: 999px;
-      color: var(--text-2);
-      font: 500 14px/1 'Inter', sans-serif;
-      cursor: pointer;
-      transition: all .18s var(--ease);
-    }
-    .transport-toggle:hover {
-      border-color: var(--transport);
-      color: var(--transport);
-      background: var(--transport-soft);
-    }
-
-    /* Transport mode select (styled like badge inside head) */
     .mode-sel {
       font-family: inherit;
       font-size: 14px; font-weight: 500;
@@ -362,30 +321,84 @@
     .mode-sel option { background: var(--surface-2); color: var(--text); }
     .mode-sel:focus { border-color: var(--transport); }
 
-    /* ───────── Add row ───────── */
-    .add-row {
-      display: flex; gap: 10px; padding-left: 76px;
-      margin-top: 14px;
+    .card-body {
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 22px;
     }
-    .add-btn {
-      display: inline-flex; align-items: center; gap: 7px;
-      padding: 12px 20px;
-      border-radius: 999px;
+    .field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+    .field.span2 { grid-column: 1 / -1; }
+    .label {
+      font-size: 12px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .11em;
+      color: var(--text-3);
+    }
+    .inp {
+      font: 400 17px/1.5 'Inter', sans-serif;
+      color: var(--text);
+      border: none;
+      border-bottom: 1.5px solid transparent;
+      background: transparent;
+      outline: none; padding: 4px 0;
+      width: 100%; min-width: 0;
+    }
+    .card.type-activity  .inp:focus { border-bottom-color: var(--activity); }
+    .card.type-transport .inp:focus { border-bottom-color: var(--transport); }
+    .card.type-hotel     .inp:focus { border-bottom-color: var(--hotel); }
+    .inp::placeholder { color: var(--text-3); }
+    textarea.inp { resize: none; min-height: 44px; line-height: 1.55; font-family: inherit; }
+
+    /* ───────── Big add buttons ───────── */
+    .day-adds {
+      margin-left: 56px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .day-add {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      padding: 18px 14px;
       background: var(--surface);
       border: 1px dashed var(--border-2);
+      border-radius: var(--r-lg);
       color: var(--text-2);
-      font: 500 15px/1 'Inter', sans-serif;
+      font: 600 15px/1.1 'Inter', sans-serif;
       cursor: pointer;
-      transition: all .18s var(--ease);
+      transition: all .2s var(--ease);
+      text-align: center;
     }
-    .add-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
-    .add-btn.day:hover       { border-color: var(--day);       color: var(--day);       background: var(--day-soft); }
-    .add-btn.transport:hover { border-color: var(--transport); color: var(--transport); background: var(--transport-soft); }
+    .day-add .add-ico {
+      font-size: 26px; line-height: 1;
+      transition: transform .25s var(--ease);
+    }
+    .day-add:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .day-add:hover .add-ico { transform: scale(1.15); }
 
-    /* ───────── Empty ───────── */
+    .day-add.activity:hover  { border-color: var(--activity);  color: var(--activity);  background: var(--activity-soft); }
+    .day-add.transport:hover { border-color: var(--transport); color: var(--transport); background: var(--transport-soft); }
+    .day-add.hotel:hover     { border-color: var(--hotel);     color: var(--hotel);     background: var(--hotel-soft); }
+
+    /* Unscheduled / out-of-range cards */
+    .unscheduled {
+      margin-top: 56px;
+      padding: 20px;
+      background: rgba(255,255,255,.02);
+      border: 1px dashed var(--border);
+      border-radius: var(--r-lg);
+    }
+    .unscheduled-title {
+      font-size: 14px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .14em;
+      color: var(--text-3);
+      margin-bottom: 14px;
+    }
+
+    /* ───────── Empty state ───────── */
     .empty {
       padding: 80px 24px; text-align: center; color: var(--text-3);
-      font-family: 'Inter', sans-serif; font-style: italic; font-size: 22px;
+      font-style: italic; font-size: 22px;
     }
 
     /* ───────── Loader ───────── */
@@ -399,40 +412,27 @@
       transition: opacity .25s var(--ease), visibility .25s;
     }
     .loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-
     .loader-dot {
       width: 14px; height: 14px; border-radius: 50%;
-      background: var(--day);
-      box-shadow:
-        0 0 0 0 var(--day-ring),
-        0 0 40px var(--day-ring);
+      background: var(--activity);
       animation: loader-pulse 1.3s var(--ease) infinite;
     }
     @keyframes loader-pulse {
-      0%, 100% { transform: scale(1);   box-shadow: 0 0 0 0   var(--day-ring), 0 0 40px var(--day-ring); background: var(--day); }
+      0%, 100% { transform: scale(1);   box-shadow: 0 0 0 0   var(--activity-ring), 0 0 40px var(--activity-ring); background: var(--activity); }
       50%      { transform: scale(1.6); box-shadow: 0 0 0 14px rgba(167,139,250,0), 0 0 60px var(--transport-ring); background: var(--transport); }
     }
-    .loader-text {
-      font-size: 14px; font-weight: 500; color: var(--text-2);
-      letter-spacing: .02em;
-    }
-    .loader-sub {
-      font-size: 12px; color: var(--text-3); margin-top: -12px;
-      opacity: 0; transition: opacity .4s;
-    }
+    .loader-text { font-size: 15px; font-weight: 500; color: var(--text-2); letter-spacing: .02em; }
+    .loader-sub  { font-size: 13px; color: var(--text-3); margin-top: -12px; opacity: 0; transition: opacity .4s; }
     .loader-sub.show { opacity: 1; }
-
-    /* Lock scroll while loader is up */
-    body.loading { overflow: hidden; }
 
     /* ───────── Toast ───────── */
     .toast {
-      position: fixed; bottom: 26px; left: 50%;
+      position: fixed; bottom: 28px; left: 50%;
       transform: translate(-50%, 60px); opacity: 0;
       background: var(--surface-3); color: var(--text);
       border: 1px solid var(--border-2);
-      padding: 12px 22px; border-radius: 999px;
-      font: 500 14px 'Inter', sans-serif;
+      padding: 13px 24px; border-radius: 999px;
+      font: 500 15px 'Inter', sans-serif;
       box-shadow: var(--shadow-lg);
       transition: transform .35s var(--ease), opacity .22s;
       z-index: 999; pointer-events: none;
@@ -443,44 +443,37 @@
     .toast.bad { border-color: var(--danger);  color: var(--danger); }
 
     /* ───────── Responsive ───────── */
-    /* Tablet / narrow desktop — stack header into two rows */
-    @media (max-width: 720px) {
-      .topbar-inner {
-        flex-wrap: wrap;
-        align-items: stretch;
-        gap: 8px;
-        padding: 10px 16px;
-      }
+    @media (max-width: 780px) {
+      .topbar-inner { flex-wrap: wrap; gap: 10px; padding: 12px 16px; }
       .brand { flex: 1 1 100%; min-width: 0; }
-      .toolbar {
-        flex: 1 1 100%;
-        justify-content: flex-end;
-        gap: 6px;
-      }
+      .toolbar { flex: 1 1 100%; justify-content: flex-end; gap: 6px; }
       .status { margin-right: auto; padding-left: 4px; }
-      .btn { padding: 8px 14px; font-size: 13px; min-height: 38px; }
+      .btn { padding: 9px 16px; font-size: 14px; min-height: 40px; }
+      .range-bar { padding: 24px 16px 0; gap: 10px; }
     }
 
-    /* Phone */
-    @media (max-width: 520px) {
-      .stage { padding: 24px 14px 96px; }
-      .intro {
-        padding-left: 54px;
-        font-size: 19px;
-        margin-bottom: 32px;
-        line-height: 1.4;
-      }
+    @media (max-width: 560px) {
+      .stage { padding: 22px 14px 120px; }
+      .intro { font-size: 18px; margin-bottom: 28px; }
 
-      .tl::before { left: 24px; }
-      .tl-node    { left: 12px; top: 16px; width: 26px; height: 26px; font-size: 12px; }
-      .tl-item    { padding-left: 54px; margin-bottom: 18px; }
-      .add-row    { padding-left: 54px; flex-wrap: wrap; gap: 8px; }
-      .add-btn    { padding: 12px 18px; font-size: 14px; width: 100%; justify-content: center; }
+      .days::before { left: 18px; }
+      .day-header { padding: 14px 16px 14px 56px; border-radius: var(--r-lg); }
+      .day-dot { left: 8px; width: 22px; height: 22px; }
+      .day-title { font-size: 22px; }
+      .day-weekday { font-size: 13px; }
+      .day-num { font-size: 11px; letter-spacing: .16em; }
+      .day-count { font-size: 12px; padding: 4px 10px; }
 
-      .card-head {
-        padding: 12px 14px;
+      .day-cards { padding: 12px 0 12px 28px; gap: 10px; }
+      .day-adds {
+        margin-left: 28px;
+        grid-template-columns: 1fr;
         gap: 8px;
       }
+      .day-add { padding: 14px; flex-direction: row; justify-content: flex-start; gap: 12px; font-size: 15px; }
+      .day-add .add-ico { font-size: 22px; }
+
+      .card-head { padding: 12px 14px; gap: 8px; }
       .card-body {
         padding: 14px;
         grid-template-columns: 1fr;
@@ -488,29 +481,29 @@
       }
       .field.span2 { grid-column: 1; }
 
-      .head-date { font-size: 14px; padding: 5px 10px; }
-      .badge     { padding: 5px 12px; font-size: 11px; }
-      .mode-sel  { font-size: 13px; padding: 5px 10px 5px 8px; max-width: 150px; }
+      .type-pill { font-size: 11px; padding: 4px 10px; }
+      .badge     { font-size: 11px; padding: 4px 10px; }
+      .mode-sel  { font-size: 13px; }
+      .inp       { font-size: 16px; } /* ≥16px prevents iOS zoom */
+      .label     { font-size: 12px; }
 
-      /* Keep inputs ≥16px to avoid iOS zoom-on-focus */
-      .inp { font-size: 16px; }
+      .brand-title { font-size: 26px; }
+      .brand-meta  { font-size: 13px; }
 
-      .btn-tiny { padding: 8px 10px; min-width: 36px; font-size: 13px; }
-
-      .brand-title { font-size: 24px; }
-      .brand-meta  { font-size: 12px; }
-
-      .topbar-inner { padding: 10px 14px; }
+      .range-bar   { padding: 18px 14px 0; }
+      .range-picker { padding: 4px 6px; gap: 4px; flex-wrap: wrap; }
+      .range-date   { font-size: 15px; padding: 7px 12px; }
+      .range-label  { flex: 1 1 100%; }
     }
 
-    /* Very small phones */
-    @media (max-width: 360px) {
-      .tl::before { left: 20px; }
-      .tl-node    { left: 8px; }
-      .tl-item    { padding-left: 48px; }
-      .add-row    { padding-left: 48px; }
-      .intro      { padding-left: 48px; font-size: 17px; }
-      .brand-title { font-size: 22px; }
+    @media (max-width: 380px) {
+      .days::before { left: 14px; }
+      .day-header { padding-left: 50px; }
+      .day-dot { left: 4px; }
+      .day-cards, .day-adds { padding-left: 22px; margin-left: 22px; }
+      .day-cards { padding-left: 22px; }
+      .day-adds  { margin-left: 22px; }
+      .brand-title { font-size: 24px; }
     }
   </style>
 </head>
@@ -537,27 +530,39 @@
   </div>
 </header>
 
-<main class="stage">
-  <p class="intro">A <span class="accent">day-by-day</span> chronology — scroll down to move forward in time.</p>
-
-  <div class="tl" id="tl"></div>
-
-  <div class="add-row">
-    <button class="add-btn day" onclick="addEntry()">＋ Add entry</button>
+<div class="range-bar">
+  <span class="range-label">Trip</span>
+  <div class="range-picker">
+    <span class="range-date-wrap">
+      <button type="button" class="range-date" id="startBtn" onclick="openDate(this)">—</button>
+      <input class="range-date-hidden" id="startInput" type="date"
+             onchange="setRange('startDate', this.value)" />
+    </span>
+    <span class="range-arrow">→</span>
+    <span class="range-date-wrap">
+      <button type="button" class="range-date" id="endBtn" onclick="openDate(this)">—</button>
+      <input class="range-date-hidden" id="endInput" type="date"
+             onchange="setRange('endDate', this.value)" />
+    </span>
   </div>
+</div>
+
+<main class="stage">
+  <p class="intro">A chronology of your trip, day by day. Pick your start and end above, then add an <strong style="color:var(--activity)">activity</strong>, <strong style="color:var(--transport)">transport</strong>, or <strong style="color:var(--hotel)">hotel</strong> to any day.</p>
+
+  <div class="days" id="days"></div>
 </main>
 
 <div class="toast" id="toast"></div>
 
 <script>
   // ── Config ───────────────────────────────────────────────────
-  const LS       = 'tp_items_v2';
-  const LS_TITLE = 'tp_title';
-  const BIN_ID   = '69e6843eaaba8821971d19a9';
-  const BIN_KEY  = '$2a$10$I4VrBBHY70cCt0j8YaGuNOfCYbsoQx7yxf/tcCtn8dTdR7yNBRVxq';
-  const BIN_URL  = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
-  const SAVE_DEBOUNCE_MS = 10000;
-  const LOAD_TIMEOUT_MS  = 8000;
+  const LS        = 'tp_state_v3';
+  const BIN_ID    = '69e6843eaaba8821971d19a9';
+  const BIN_KEY   = '$2a$10$I4VrBBHY70cCt0j8YaGuNOfCYbsoQx7yxf/tcCtn8dTdR7yNBRVxq';
+  const BIN_URL   = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+  const SAVE_DEBOUNCE_MS  = 10000;
+  const LOAD_TIMEOUT_MS   = 8000;
   const LOAD_SLOW_HINT_MS = 2500;
 
   const MODES = {
@@ -570,8 +575,19 @@
     other:  { icon: '📍', label: 'Other'  },
   };
 
+  const TYPES = {
+    activity:  { icon: '☀',  label: 'Activity',  accent: 'activity'  },
+    transport: { icon: '✈',  label: 'Transport', accent: 'transport' },
+    hotel:     { icon: '🏨', label: 'Hotel',     accent: 'hotel'     },
+  };
+
   // ── State ────────────────────────────────────────────────────
-  let items     = [];
+  let state = {
+    title: 'Our Trip',
+    startDate: '',
+    endDate: '',
+    cards: [],
+  };
   let history   = [];
   let saveTimer = null;
   let dirty     = false;
@@ -580,11 +596,9 @@
 
   // ── Boot ─────────────────────────────────────────────────────
   function init() {
-    const t = localStorage.getItem(LS_TITLE);
-    if (t) document.getElementById('tripTitle').value = t;
-
     document.getElementById('tripTitle').addEventListener('input', e => {
-      localStorage.setItem(LS_TITLE, e.target.value);
+      state.title = e.target.value;
+      scheduleSave();
       updateMeta();
     });
 
@@ -598,65 +612,103 @@
 
     io = new IntersectionObserver(entries => {
       entries.forEach(en => { if (en.isIntersecting) en.target.classList.add('visible'); });
-    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
 
     load();
   }
 
   function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 5); }
 
-  function seed() { return [blank()]; }
-
-  function blank() {
-    return {
-      id: uid(),
-      date: '', city: '', activity: '', time: '', notes: '', status: 'idea',
-      hasTransport: false,
-      mode: 'flight', from: '', to: '',
-      departTime: '', arriveTime: '', confirmation: '',
-    };
-  }
-
-  // ── Local fallback ───────────────────────────────────────────
-  function loadLocal() {
-    try {
-      const s = localStorage.getItem(LS);
-      items = s ? JSON.parse(s) : seed();
-    } catch { items = seed(); }
-    items = items.map(migrate);
-    render();
-  }
-
-  // Accepts:
-  //   - new unified entries (pass through)
-  //   - legacy { type:'day', ... }
-  //   - legacy { type:'transport', from, to, ... }  → folded into an entry with hasTransport=true
-  function migrate(it) {
-    const base = {
-      id: it.id || uid(),
-      date: it.date || '',
-      city: it.city || '',
-      activity: it.activity || '',
-      time: it.time || '',
-      notes: it.notes || '',
-      status: it.status || 'idea',
-      hasTransport: !!it.hasTransport,
-      mode: it.mode || 'flight',
-      from: it.from || '',
-      to: it.to || '',
-      departTime: it.departTime || '',
-      arriveTime: it.arriveTime || '',
-      confirmation: it.confirmation || '',
-    };
-    if (it.type === 'transport') {
-      base.hasTransport = true;
-      base.city = base.city || it.to || '';
-      base.time = base.time || it.departTime || '';
-    }
+  function blankCard(type, date = '') {
+    const base = { id: uid(), type, date, status: 'idea', notes: '' };
+    if (type === 'activity')  return { ...base, location: '', time: '', activity: '' };
+    if (type === 'transport') return { ...base, mode: 'flight', from: '', to: '', departTime: '', arriveTime: '', confirmation: '' };
+    if (type === 'hotel')     return { ...base, name: '', address: '', checkInTime: '', checkOutDate: '', confirmation: '' };
     return base;
   }
 
-  function saveLocal() { localStorage.setItem(LS, JSON.stringify(items)); }
+  // ── Migration from older shapes ──────────────────────────────
+  function migrate(data) {
+    // Already new format
+    if (data && Array.isArray(data.cards)) {
+      return {
+        title:     data.title     || 'Our Trip',
+        startDate: data.startDate || '',
+        endDate:   data.endDate   || '',
+        cards:     data.cards.map(normalizeCard),
+      };
+    }
+    // Old format: { items: [{...}] } or just [{...}]
+    const items = Array.isArray(data) ? data : (data?.items || []);
+    const cards = items.flatMap(old => {
+      // Legacy transport entry
+      if (old.type === 'transport') {
+        return [normalizeCard({
+          id: old.id, type: 'transport', date: old.date, status: old.status,
+          mode: old.mode, from: old.from, to: old.to,
+          departTime: old.departTime, arriveTime: old.arriveTime,
+          confirmation: old.confirmation, notes: old.notes,
+        })];
+      }
+      // Legacy day entry (possibly with hasTransport)
+      const out = [];
+      out.push(normalizeCard({
+        id: old.id, type: 'activity', date: old.date, status: old.status,
+        location: old.city, time: old.time, activity: old.activity, notes: old.notes,
+      }));
+      if (old.hasTransport) {
+        out.push(normalizeCard({
+          id: uid(), type: 'transport', date: old.date, status: old.status,
+          mode: old.mode, from: old.from, to: old.to,
+          departTime: old.departTime, arriveTime: old.arriveTime,
+          confirmation: old.confirmation, notes: '',
+        }));
+      }
+      return out;
+    });
+    const dates = cards.map(c => c.date).filter(Boolean).sort();
+    return {
+      title:     data?.title || 'Our Trip',
+      startDate: dates[0] || '',
+      endDate:   dates[dates.length - 1] || '',
+      cards,
+    };
+  }
+
+  function normalizeCard(c) {
+    const base = {
+      id:     c.id || uid(),
+      type:   c.type || 'activity',
+      date:   c.date || '',
+      status: c.status || 'idea',
+      notes:  c.notes  || '',
+    };
+    if (base.type === 'activity')  return { ...base, location: c.location || '', time: c.time || '', activity: c.activity || '' };
+    if (base.type === 'transport') return {
+      ...base,
+      mode: c.mode || 'flight',
+      from: c.from || '', to: c.to || '',
+      departTime: c.departTime || '', arriveTime: c.arriveTime || '',
+      confirmation: c.confirmation || '',
+    };
+    if (base.type === 'hotel') return {
+      ...base,
+      name: c.name || '', address: c.address || '',
+      checkInTime: c.checkInTime || '', checkOutDate: c.checkOutDate || '',
+      confirmation: c.confirmation || '',
+    };
+    return base;
+  }
+
+  // ── Local fallback ───────────────────────────────────────────
+  function saveLocal() { localStorage.setItem(LS, JSON.stringify(state)); }
+  function loadLocal() {
+    try {
+      const s = localStorage.getItem(LS);
+      state = migrate(s ? JSON.parse(s) : {});
+    } catch { state = migrate({}); }
+    render();
+  }
 
   // ── Loader overlay ───────────────────────────────────────────
   function hideLoader() {
@@ -670,8 +722,7 @@
     const controller = new AbortController();
     const timeout   = setTimeout(() => controller.abort(), LOAD_TIMEOUT_MS);
     const slowHint  = setTimeout(() => {
-      const sub = document.getElementById('loaderSub');
-      if (sub) sub.classList.add('show');
+      document.getElementById('loaderSub')?.classList.add('show');
     }, LOAD_SLOW_HINT_MS);
 
     try {
@@ -681,18 +732,12 @@
       });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
-      const saved = data?.record?.items;
-      if (Array.isArray(saved)) {
-        items = (saved.length ? saved : seed()).map(migrate);
-        history = [];
-        document.getElementById('undoBtn').disabled = true;
-        dirty = false;
-        render();
-        setState('idle');
-      } else {
-        loadLocal();
-        setState('idle');
-      }
+      state = migrate(data?.record || {});
+      history = [];
+      document.getElementById('undoBtn').disabled = true;
+      dirty = false;
+      render();
+      setState('idle');
     } catch (e) {
       console.error(e);
       loadLocal();
@@ -702,8 +747,7 @@
         : 'Could not reach server — showing local data';
       toast(msg, 'bad');
     } finally {
-      clearTimeout(timeout);
-      clearTimeout(slowHint);
+      clearTimeout(timeout); clearTimeout(slowHint);
       hideLoader();
     }
   }
@@ -720,7 +764,7 @@
     if (saving) return;
     if (!dirty) { setState('saved'); return; }
     saving = true; dirty = false;
-    const snapshot = JSON.stringify({ items });
+    const snapshot = JSON.stringify(state);
     setState('saving');
     try {
       const res = await fetch(BIN_URL, {
@@ -747,7 +791,6 @@
   }
 
   function saveToSheets() { dirty = true; clearTimeout(saveTimer); doSave(); }
-
   async function loadFromSheets() {
     if (dirty || saving) {
       if (!confirm('You have unsaved changes. Load will overwrite them. Continue?')) return;
@@ -757,14 +800,9 @@
 
   function setState(s) { setStatusClass(s); setStatusText(stateLabel(s)); }
   function stateLabel(s) {
-    switch (s) {
-      case 'idle':   return '';
-      case 'dirty':  return '· unsaved';
-      case 'saving': return '↑ saving…';
-      case 'saved':  return '✓ saved';
-      case 'err':    return '⚠ retrying';
-    }
-    return '';
+    return s === 'idle' ? '' : s === 'dirty' ? '· unsaved' :
+           s === 'saving' ? '↑ saving…' : s === 'saved' ? '✓ saved' :
+           s === 'err' ? '⚠ retrying' : '';
   }
   function setStatusClass(s) {
     const el = document.getElementById('statusDot');
@@ -775,141 +813,299 @@
   }
   function setStatusText(t) { document.getElementById('statusDot').textContent = t; }
 
+  // ── Date helpers ─────────────────────────────────────────────
+  function fmtDate(s) {
+    if (!s) return '';
+    const d = new Date(s + 'T12:00:00');
+    const day   = d.getDate();
+    const month = d.toLocaleDateString('en-US', { month: 'long' }).toLowerCase();
+    return `${day}/${month}/${d.getFullYear()}`;
+  }
+  function fmtWeekday(s) {
+    if (!s) return '';
+    return new Date(s + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long' });
+  }
+  function daysBetween(a, b) {
+    if (!a || !b) return [];
+    const start = new Date(a + 'T12:00:00');
+    const end   = new Date(b + 'T12:00:00');
+    if (end < start) return [];
+    const out = [];
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      out.push(d.toISOString().slice(0, 10));
+    }
+    return out;
+  }
+
+  function openDate(btn) {
+    const input = btn.nextElementSibling;
+    if (input && typeof input.showPicker === 'function') {
+      try { input.showPicker(); return; } catch {}
+    }
+    if (input) { input.focus(); input.click(); }
+  }
+
+  function setRange(field, value) {
+    pushHistory();
+    state[field] = value;
+    if (state.startDate && state.endDate && state.startDate > state.endDate) {
+      if (field === 'startDate') state.endDate = value;
+      else state.startDate = value;
+    }
+    render(); scheduleSave();
+  }
+
   // ── Render ───────────────────────────────────────────────────
   function render() {
-    const tl = document.getElementById('tl');
-    tl.innerHTML = '';
+    document.getElementById('tripTitle').value = state.title;
+    renderRangePickers();
+    updateMeta();
 
-    if (!items.length) {
-      tl.innerHTML = '<div class="empty">No entries yet. Add a day or a flight below.</div>';
-      updateMeta(); return;
+    const wrap = document.getElementById('days');
+    wrap.innerHTML = '';
+
+    const dates = daysBetween(state.startDate, state.endDate);
+    if (!dates.length) {
+      wrap.innerHTML = `<div class="empty">Pick a start and end date to build your chronology.</div>`;
+      saveLocal();
+      return;
     }
 
-    const ordered = sortItems(items);
-    ordered.forEach(item => tl.appendChild(renderCard(item)));
-
-    // reveal on scroll
-    document.querySelectorAll('.tl-item').forEach(el => io.observe(el));
-
-    saveLocal();
-    updateMeta();
-  }
-
-  function sortItems(arr) {
-    return [...arr].sort((a, b) => {
-      const da = a.date || '9999-12-31';
-      const db = b.date || '9999-12-31';
-      if (da !== db) return da.localeCompare(db);
-      const ta = (a.time || a.departTime || '');
-      const tb = (b.time || b.departTime || '');
-      return ta.localeCompare(tb);
+    dates.forEach((date, idx) => {
+      wrap.appendChild(renderDayBlock(date, idx + 1));
     });
+
+    // Unscheduled cards (outside range)
+    const inRange = new Set(dates);
+    const outside = state.cards.filter(c => !c.date || !inRange.has(c.date));
+    if (outside.length) {
+      wrap.appendChild(renderUnscheduled(outside));
+    }
+
+    document.querySelectorAll('.day-block').forEach(el => io.observe(el));
+    saveLocal();
   }
 
-  function renderCard(item) {
-    const el = document.createElement('article');
-    el.className = 'tl-item' + (item.hasTransport ? ' has-transport' : '');
-    const mode = MODES[item.mode] || MODES.other;
-    const nodeIcon = item.hasTransport ? mode.icon : '·';
+  function renderRangePickers() {
+    const startBtn   = document.getElementById('startBtn');
+    const endBtn     = document.getElementById('endBtn');
+    const startInput = document.getElementById('startInput');
+    const endInput   = document.getElementById('endInput');
+    startInput.value = state.startDate || '';
+    endInput.value   = state.endDate   || '';
+    startBtn.textContent = state.startDate ? fmtDate(state.startDate) : 'Set start';
+    endBtn.textContent   = state.endDate   ? fmtDate(state.endDate)   : 'Set end';
+    startBtn.classList.toggle('empty', !state.startDate);
+    endBtn.classList.toggle('empty',   !state.endDate);
+  }
+
+  function updateMeta() {
+    const meta = document.getElementById('tripMeta');
+    const dates = daysBetween(state.startDate, state.endDate);
+    const n = state.cards.length;
+    const entries = n ? `${n} entr${n !== 1 ? 'ies' : 'y'}` : '0 entries';
+    if (dates.length) {
+      meta.textContent = `${dates.length} day${dates.length !== 1 ? 's' : ''} · ${entries}`;
+    } else {
+      meta.textContent = entries;
+    }
+  }
+
+  function renderDayBlock(date, dayNum) {
+    const el = document.createElement('section');
+    el.className = 'day-block';
+
+    const dayCards = state.cards
+      .filter(c => c.date === date)
+      .sort(sortCards);
 
     el.innerHTML = `
-      <div class="tl-node">${nodeIcon}</div>
-      <div class="card">
-        <header class="card-head">
-          <span class="date-wrap">
-            <button type="button" class="head-date ${item.date ? '' : 'empty'}"
-                    onclick="openDate(this)">
-              ${item.date ? fmtDate(item.date) : 'Pick date'}
-            </button>
-            <input class="head-date-hidden" type="date" value="${item.date}"
-                   onchange="upd('${item.id}','date',this.value); render()" />
-          </span>
-          <div class="head-right">
-            <select class="badge badge-${item.status}"
-                    onchange="updStatus('${item.id}',this)">
-              ${statusOptions(item.status)}
-            </select>
-            <button class="btn btn-tiny danger" title="Remove entry"
-                    onclick="removeItem('${item.id}')">✕</button>
-          </div>
-        </header>
-
-        <div class="card-body">
-          <div class="field">
-            <label class="label">Location</label>
-            <input class="inp" type="text" value="${x(item.city)}"
-                   placeholder="e.g. Paris"
-                   onchange="upd('${item.id}','city',this.value)" />
-          </div>
-          <div class="field">
-            <label class="label">Time</label>
-            <input class="inp" type="time" value="${x(item.time)}"
-                   onchange="upd('${item.id}','time',this.value)" />
-          </div>
-          <div class="field span2">
-            <label class="label">Activity</label>
-            <input class="inp" type="text" value="${x(item.activity)}"
-                   placeholder="What are you doing?"
-                   onchange="upd('${item.id}','activity',this.value)" />
-          </div>
-          <div class="field span2">
-            <label class="label">Notes</label>
-            <textarea class="inp" rows="2"
-                      placeholder="Links, reservations, things to remember…"
-                      onchange="upd('${item.id}','notes',this.value)">${x(item.notes)}</textarea>
-          </div>
+      <div class="day-header">
+        <span class="day-dot"></span>
+        <div class="day-header-main">
+          <span class="day-num">Day ${dayNum}</span>
+          <h3 class="day-title">
+            <span class="day-weekday">${fmtWeekday(date)}</span>
+            ${fmtDate(date)}
+          </h3>
         </div>
+        <span class="day-count">${dayCards.length} entr${dayCards.length === 1 ? 'y' : 'ies'}</span>
+      </div>
 
-        ${item.hasTransport ? renderTransportSection(item) : `
-          <button class="transport-toggle" onclick="enableTransport('${item.id}')">
-            ＋ Add transport details
-          </button>
-        `}
+      <div class="day-cards"></div>
+
+      <div class="day-adds">
+        <button class="day-add activity"  onclick="addCard('activity','${date}')">
+          <span class="add-ico">☀</span><span>Activity</span>
+        </button>
+        <button class="day-add transport" onclick="addCard('transport','${date}')">
+          <span class="add-ico">✈️</span><span>Transport</span>
+        </button>
+        <button class="day-add hotel"     onclick="addCard('hotel','${date}')">
+          <span class="add-ico">🏨</span><span>Hotel</span>
+        </button>
       </div>`;
+
+    const cardsEl = el.querySelector('.day-cards');
+    dayCards.forEach(c => cardsEl.appendChild(renderCard(c)));
     return el;
   }
 
-  function renderTransportSection(item) {
-    return `
-      <div class="transport">
-        <div class="transport-head">
-          <span class="transport-label">Transport</span>
-          <select class="mode-sel" onchange="upd('${item.id}','mode',this.value); render()">
+  function renderUnscheduled(cards) {
+    const el = document.createElement('section');
+    el.className = 'unscheduled day-block';
+    el.innerHTML = `
+      <div class="unscheduled-title">Unscheduled · outside trip range</div>
+      <div class="day-cards" style="padding-left:0;"></div>`;
+    const list = el.querySelector('.day-cards');
+    cards.forEach(c => list.appendChild(renderCard(c)));
+    return el;
+  }
+
+  function sortCards(a, b) {
+    const typeOrder = { transport: 0, activity: 1, hotel: 2 };
+    const ta = a.time || a.departTime || a.checkInTime || '';
+    const tb = b.time || b.departTime || b.checkInTime || '';
+    if (ta && tb && ta !== tb) return ta.localeCompare(tb);
+    if (a.type !== b.type) return (typeOrder[a.type] ?? 9) - (typeOrder[b.type] ?? 9);
+    return 0;
+  }
+
+  function renderCard(c) {
+    const el = document.createElement('article');
+    el.className = `card type-${c.type}`;
+
+    const head = `
+      <header class="card-head">
+        <span class="type-pill">${TYPES[c.type].icon} ${TYPES[c.type].label}</span>
+        ${c.type === 'transport' ? `
+          <select class="mode-sel" onchange="upd('${c.id}','mode',this.value); render()">
             ${Object.entries(MODES).map(([k,v]) =>
-              `<option value="${k}" ${item.mode===k?'selected':''}>${v.icon}  ${v.label}</option>`
+              `<option value="${k}" ${c.mode===k?'selected':''}>${v.icon}  ${v.label}</option>`
             ).join('')}
           </select>
-          <button class="transport-remove" onclick="disableTransport('${item.id}')">Remove</button>
+        ` : ''}
+        <div class="head-right">
+          <select class="badge badge-${c.status}" onchange="updStatus('${c.id}',this)">
+            ${statusOptions(c.status)}
+          </select>
+          <button class="btn btn-tiny danger" title="Remove" onclick="removeCard('${c.id}')">✕</button>
         </div>
-        <div class="card-body">
-          <div class="field">
-            <label class="label">From</label>
-            <input class="inp" type="text" value="${x(item.from)}"
-                   placeholder="e.g. Montevideo (MVD)"
-                   onchange="upd('${item.id}','from',this.value)" />
-          </div>
-          <div class="field">
-            <label class="label">To</label>
-            <input class="inp" type="text" value="${x(item.to)}"
-                   placeholder="e.g. Paris (CDG)"
-                   onchange="upd('${item.id}','to',this.value)" />
-          </div>
-          <div class="field">
-            <label class="label">Departure</label>
-            <input class="inp" type="time" value="${x(item.departTime)}"
-                   onchange="upd('${item.id}','departTime',this.value)" />
-          </div>
-          <div class="field">
-            <label class="label">Arrival</label>
-            <input class="inp" type="time" value="${x(item.arriveTime)}"
-                   onchange="upd('${item.id}','arriveTime',this.value)" />
-          </div>
-          <div class="field span2">
-            <label class="label">Reference / confirmation</label>
-            <input class="inp" type="text" value="${x(item.confirmation)}"
-                   placeholder="e.g. AF1234 · booking code ABC123"
-                   onchange="upd('${item.id}','confirmation',this.value)" />
-          </div>
+      </header>`;
+
+    const body = c.type === 'activity'  ? activityBody(c)
+               : c.type === 'transport' ? transportBody(c)
+               : hotelBody(c);
+
+    el.innerHTML = head + body;
+    return el;
+  }
+
+  function activityBody(c) {
+    return `
+      <div class="card-body">
+        <div class="field">
+          <label class="label">Location</label>
+          <input class="inp" type="text" value="${x(c.location)}"
+                 placeholder="e.g. Paris"
+                 onchange="upd('${c.id}','location',this.value)" />
+        </div>
+        <div class="field">
+          <label class="label">Time</label>
+          <input class="inp" type="time" value="${x(c.time)}"
+                 onchange="upd('${c.id}','time',this.value)" />
+        </div>
+        <div class="field span2">
+          <label class="label">Activity</label>
+          <input class="inp" type="text" value="${x(c.activity)}"
+                 placeholder="What are you doing?"
+                 onchange="upd('${c.id}','activity',this.value)" />
+        </div>
+        <div class="field span2">
+          <label class="label">Notes</label>
+          <textarea class="inp" rows="2"
+                    placeholder="Links, reservations, things to remember…"
+                    onchange="upd('${c.id}','notes',this.value)">${x(c.notes)}</textarea>
+        </div>
+      </div>`;
+  }
+
+  function transportBody(c) {
+    return `
+      <div class="card-body">
+        <div class="field">
+          <label class="label">From</label>
+          <input class="inp" type="text" value="${x(c.from)}"
+                 placeholder="e.g. Montevideo (MVD)"
+                 onchange="upd('${c.id}','from',this.value)" />
+        </div>
+        <div class="field">
+          <label class="label">To</label>
+          <input class="inp" type="text" value="${x(c.to)}"
+                 placeholder="e.g. Paris (CDG)"
+                 onchange="upd('${c.id}','to',this.value)" />
+        </div>
+        <div class="field">
+          <label class="label">Departure</label>
+          <input class="inp" type="time" value="${x(c.departTime)}"
+                 onchange="upd('${c.id}','departTime',this.value)" />
+        </div>
+        <div class="field">
+          <label class="label">Arrival</label>
+          <input class="inp" type="time" value="${x(c.arriveTime)}"
+                 onchange="upd('${c.id}','arriveTime',this.value)" />
+        </div>
+        <div class="field span2">
+          <label class="label">Reference / confirmation</label>
+          <input class="inp" type="text" value="${x(c.confirmation)}"
+                 placeholder="e.g. AF1234 · booking code ABC123"
+                 onchange="upd('${c.id}','confirmation',this.value)" />
+        </div>
+        <div class="field span2">
+          <label class="label">Notes</label>
+          <textarea class="inp" rows="2"
+                    placeholder="Seat, terminal, baggage, links…"
+                    onchange="upd('${c.id}','notes',this.value)">${x(c.notes)}</textarea>
+        </div>
+      </div>`;
+  }
+
+  function hotelBody(c) {
+    return `
+      <div class="card-body">
+        <div class="field">
+          <label class="label">Hotel name</label>
+          <input class="inp" type="text" value="${x(c.name)}"
+                 placeholder="e.g. Hotel Eiffel"
+                 onchange="upd('${c.id}','name',this.value)" />
+        </div>
+        <div class="field">
+          <label class="label">Check-in time</label>
+          <input class="inp" type="time" value="${x(c.checkInTime)}"
+                 onchange="upd('${c.id}','checkInTime',this.value)" />
+        </div>
+        <div class="field span2">
+          <label class="label">Address</label>
+          <input class="inp" type="text" value="${x(c.address)}"
+                 placeholder="e.g. 5 Av. Anatole France, Paris"
+                 onchange="upd('${c.id}','address',this.value)" />
+        </div>
+        <div class="field">
+          <label class="label">Check-out date</label>
+          <input class="inp" type="date" value="${x(c.checkOutDate)}"
+                 onchange="upd('${c.id}','checkOutDate',this.value)" />
+        </div>
+        <div class="field">
+          <label class="label">Confirmation</label>
+          <input class="inp" type="text" value="${x(c.confirmation)}"
+                 placeholder="e.g. Booking.com · ABC123"
+                 onchange="upd('${c.id}','confirmation',this.value)" />
+        </div>
+        <div class="field span2">
+          <label class="label">Notes</label>
+          <textarea class="inp" rows="2"
+                    placeholder="Room preferences, breakfast, Wi-Fi…"
+                    onchange="upd('${c.id}','notes',this.value)">${x(c.notes)}</textarea>
         </div>
       </div>`;
   }
@@ -926,43 +1122,15 @@
     return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
-  // ── Meta (date range in header) ──────────────────────────────
-  function updateMeta() {
-    const dates = items.map(i => i.date).filter(Boolean).sort();
-    const n = items.length;
-    const part = n ? `${n} entr${n !== 1 ? 'ies' : 'y'}` : '';
-    const meta = document.getElementById('tripMeta');
-    if (dates.length >= 2) meta.textContent = `${fmtDate(dates[0])} → ${fmtDate(dates[dates.length-1])} · ${part}`;
-    else if (dates.length === 1) meta.textContent = `${fmtDate(dates[0])} · ${part}`;
-    else meta.textContent = part;
-  }
-  // "15/may/2026" — day/lowercase month name/year
-  function fmtDate(s) {
-    if (!s) return '';
-    const d = new Date(s + 'T12:00:00');
-    const day   = d.getDate();
-    const month = d.toLocaleDateString('en-US', { month: 'long' }).toLowerCase();
-    const year  = d.getFullYear();
-    return `${day}/${month}/${year}`;
-  }
-
-  function openDate(btn) {
-    const input = btn.nextElementSibling;
-    if (input && typeof input.showPicker === 'function') {
-      try { input.showPicker(); return; } catch {}
-    }
-    if (input) { input.focus(); input.click(); }
-  }
-
   // ── History / Undo ───────────────────────────────────────────
   function pushHistory() {
-    history.push(JSON.stringify(items));
+    history.push(JSON.stringify(state));
     if (history.length > 50) history.shift();
     document.getElementById('undoBtn').disabled = false;
   }
   function undo() {
     if (!history.length) return;
-    items = JSON.parse(history.pop());
+    state = JSON.parse(history.pop());
     document.getElementById('undoBtn').disabled = history.length === 0;
     render(); scheduleSave();
     toast('Undone', '');
@@ -971,48 +1139,30 @@
   // ── Data ops ─────────────────────────────────────────────────
   function upd(id, field, val) {
     pushHistory();
-    items = items.map(i => i.id === id ? { ...i, [field]: val } : i);
-    saveLocal(); updateMeta(); scheduleSave();
+    state.cards = state.cards.map(c => c.id === id ? { ...c, [field]: val } : c);
+    updateMeta(); saveLocal(); scheduleSave();
   }
   function updStatus(id, sel) {
     sel.className = `badge badge-${sel.value}`;
     upd(id, 'status', sel.value);
   }
-  function addEntry() {
+  function addCard(type, date) {
     pushHistory();
-    const entry = blank();
-    entry.date = lastDate();
-    items.push(entry);
+    state.cards.push(blankCard(type, date));
     render(); scheduleSave();
-    scrollToLast();
+    // Scroll the new card into view
+    requestAnimationFrame(() => {
+      const cards = document.querySelectorAll(`.day-block`);
+      // find block matching the date
+      // Simpler: find the last card in the day block whose header contains this date
+      const all = document.querySelectorAll('.day-block .card');
+      if (all.length) all[all.length - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
   }
-  function removeItem(id) {
+  function removeCard(id) {
     pushHistory();
-    items = items.filter(i => i.id !== id);
+    state.cards = state.cards.filter(c => c.id !== id);
     render(); scheduleSave();
-  }
-  function enableTransport(id) {
-    pushHistory();
-    items = items.map(i => i.id === id ? { ...i, hasTransport: true } : i);
-    render(); scheduleSave();
-  }
-  function disableTransport(id) {
-    pushHistory();
-    items = items.map(i => i.id === id
-      ? { ...i, hasTransport: false, from: '', to: '', departTime: '', arriveTime: '', confirmation: '' }
-      : i);
-    render(); scheduleSave();
-  }
-
-  function lastDate() {
-    const dates = items.map(i => i.date).filter(Boolean).sort();
-    return dates[dates.length - 1] || '';
-  }
-  function scrollToLast() {
-    setTimeout(() => {
-      const cards = document.querySelectorAll('.tl-item');
-      if (cards.length) cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 80);
   }
 
   // ── Toast ─────────────────────────────────────────────────────
