@@ -7,7 +7,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
@@ -63,7 +63,7 @@
     html, body { height: 100%; }
 
     body {
-      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
       background: var(--bg-grad);
       color: var(--text);
       line-height: 1.55;
@@ -88,7 +88,7 @@
     }
     .brand { display: flex; flex-direction: column; min-width: 0; }
     .brand-title {
-      font-family: 'Bricolage Grotesque', 'Space Grotesk', sans-serif;
+      font-family: 'Inter', sans-serif;
       font-size: 26px; font-weight: 500; letter-spacing: -0.02em;
       color: var(--text); border: none; background: transparent; outline: none;
       padding: 0; width: 100%; max-width: 420px;
@@ -102,7 +102,7 @@
     .btn {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 8px 14px; border-radius: 999px;
-      font: 500 13px/1 'Space Grotesk', sans-serif;
+      font: 500 13px/1 'Inter', sans-serif;
       cursor: pointer; border: 1px solid transparent;
       transition: transform .15s var(--ease), background .15s, color .15s, border-color .15s, box-shadow .15s;
       white-space: nowrap;
@@ -141,7 +141,7 @@
 
     .intro {
       margin-bottom: 44px;
-      font-family: 'Bricolage Grotesque', 'Space Grotesk', sans-serif;
+      font-family: 'Inter', sans-serif;
       font-weight: 400;
       color: var(--text-2);
       font-size: 22px;
@@ -224,7 +224,7 @@
     .card:hover { box-shadow: var(--shadow-md); border-color: var(--border-2); }
 
     .card-head {
-      display: flex; align-items: center; gap: 10px;
+      display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
       padding: 14px 18px;
       border-bottom: 1px solid var(--border);
     }
@@ -242,7 +242,7 @@
     .tl-item.is-transport .head-kind { color: var(--transport); }
 
     .head-date {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Inter', sans-serif;
       font-size: 13px; font-weight: 600; color: var(--text);
       border: none; background: transparent; outline: none;
       padding: 3px 0; cursor: pointer;
@@ -251,7 +251,11 @@
     .head-date:focus { color: var(--day); }
     .tl-item.is-transport .head-date:focus { color: var(--transport); }
 
-    .head-spacer { flex: 1; }
+    .head-right {
+      margin-left: auto;
+      display: inline-flex; align-items: center; gap: 6px;
+      flex-shrink: 0;
+    }
 
     .badge {
       font-size: 10px; font-weight: 700;
@@ -279,7 +283,7 @@
       color: var(--text-3);
     }
     .inp {
-      font: 400 14px/1.5 'Space Grotesk', sans-serif;
+      font: 400 14px/1.5 'Inter', sans-serif;
       color: var(--text);
       border: none;
       border-bottom: 1.5px solid transparent;
@@ -319,7 +323,7 @@
       background: var(--surface);
       border: 1px dashed var(--border-2);
       color: var(--text-2);
-      font: 500 13px/1 'Space Grotesk', sans-serif;
+      font: 500 13px/1 'Inter', sans-serif;
       cursor: pointer;
       transition: all .18s var(--ease);
     }
@@ -330,7 +334,7 @@
     /* ───────── Empty ───────── */
     .empty {
       padding: 80px 24px; text-align: center; color: var(--text-3);
-      font-family: 'Bricolage Grotesque', 'Space Grotesk', sans-serif; font-style: italic; font-size: 20px;
+      font-family: 'Inter', sans-serif; font-style: italic; font-size: 20px;
     }
 
     /* ───────── Toast ───────── */
@@ -340,7 +344,7 @@
       background: var(--surface-3); color: var(--text);
       border: 1px solid var(--border-2);
       padding: 11px 20px; border-radius: 999px;
-      font: 500 13px 'Space Grotesk', sans-serif;
+      font: 500 13px 'Inter', sans-serif;
       box-shadow: var(--shadow-lg);
       transition: transform .35s var(--ease), opacity .22s;
       z-index: 999; pointer-events: none;
@@ -351,19 +355,76 @@
     .toast.bad { border-color: var(--danger);  color: var(--danger); }
 
     /* ───────── Responsive ───────── */
-    @media (max-width: 640px) {
-      .topbar-inner { padding: 12px 14px; }
-      .stage { padding: 32px 14px 100px; }
-      .intro { padding-left: 62px; font-size: 16px; }
-      .tl::before { left: 28px; }
-      .tl-node    { left: 16px; top: 18px; width: 24px; height: 24px; }
-      .tl-item    { padding-left: 62px; }
-      .add-row    { padding-left: 62px; flex-wrap: wrap; }
-      .card-body { grid-template-columns: 1fr; gap: 12px; }
+    /* Tablet / narrow desktop — stack header into two rows */
+    @media (max-width: 720px) {
+      .topbar-inner {
+        flex-wrap: wrap;
+        align-items: stretch;
+        gap: 8px;
+        padding: 10px 16px;
+      }
+      .brand { flex: 1 1 100%; min-width: 0; }
+      .toolbar {
+        flex: 1 1 100%;
+        justify-content: flex-end;
+        gap: 6px;
+      }
+      .status { margin-right: auto; padding-left: 4px; }
+      .btn { padding: 8px 14px; font-size: 13px; min-height: 38px; }
+    }
+
+    /* Phone */
+    @media (max-width: 520px) {
+      .stage { padding: 24px 14px 96px; }
+      .intro {
+        padding-left: 54px;
+        font-size: 17px;
+        margin-bottom: 32px;
+        line-height: 1.4;
+      }
+
+      .tl::before { left: 24px; }
+      .tl-node    { left: 12px; top: 16px; width: 24px; height: 24px; font-size: 11px; }
+      .tl-item    { padding-left: 54px; margin-bottom: 18px; }
+      .add-row    { padding-left: 54px; flex-wrap: wrap; gap: 8px; }
+      .add-btn    { padding: 10px 14px; font-size: 13px; width: 100%; justify-content: center; }
+
+      .card-head {
+        padding: 12px 14px;
+        gap: 8px;
+      }
+      .card-body {
+        padding: 14px;
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
       .field.span2 { grid-column: 1; }
-      .card-head { flex-wrap: wrap; }
-      .brand-title { font-size: 22px; }
-      .btn { padding: 7px 12px; font-size: 12px; }
+
+      .head-kind { padding: 3px 8px; font-size: 9px; letter-spacing: .12em; }
+      .head-date { font-size: 13px; }
+      .badge     { padding: 4px 10px; font-size: 10px; }
+      .mode-sel  { font-size: 12px; padding: 4px 8px 4px 6px; max-width: 140px; }
+
+      /* On very small screens, let the mode selector wrap to its own line */
+      .tl-item.is-transport .mode-sel { flex-basis: 100%; max-width: none; }
+
+      .inp { font-size: 15px; } /* 15px+ avoids iOS zoom-on-focus */
+
+      .btn-tiny { padding: 8px 10px; min-width: 36px; }
+
+      .brand-title { font-size: 20px; }
+      .brand-meta  { font-size: 11px; }
+
+      .topbar-inner { padding: 10px 14px; }
+    }
+
+    /* Very small phones */
+    @media (max-width: 360px) {
+      .tl::before { left: 20px; }
+      .tl-node    { left: 8px; }
+      .tl-item    { padding-left: 48px; }
+      .add-row    { padding-left: 48px; }
+      .intro      { padding-left: 48px; font-size: 16px; }
     }
   </style>
 </head>
@@ -613,13 +674,14 @@
           <span class="head-kind">Day</span>
           <input class="head-date" type="date" value="${item.date}"
                  onchange="upd('${item.id}','date',this.value)" />
-          <span class="head-spacer"></span>
-          <select class="badge badge-${item.status}"
-                  onchange="updStatus('${item.id}',this)">
-            ${statusOptions(item.status)}
-          </select>
-          <button class="btn btn-tiny danger" title="Remove"
-                  onclick="removeItem('${item.id}')">✕</button>
+          <div class="head-right">
+            <select class="badge badge-${item.status}"
+                    onchange="updStatus('${item.id}',this)">
+              ${statusOptions(item.status)}
+            </select>
+            <button class="btn btn-tiny danger" title="Remove"
+                    onclick="removeItem('${item.id}')">✕</button>
+          </div>
         </header>
         <div class="card-body">
           <div class="field">
@@ -667,13 +729,14 @@
               `<option value="${k}" ${item.mode===k?'selected':''}>${v.icon}  ${v.label}</option>`
             ).join('')}
           </select>
-          <span class="head-spacer"></span>
-          <select class="badge badge-${item.status}"
-                  onchange="updStatus('${item.id}',this)">
-            ${statusOptions(item.status)}
-          </select>
-          <button class="btn btn-tiny danger" title="Remove"
-                  onclick="removeItem('${item.id}')">✕</button>
+          <div class="head-right">
+            <select class="badge badge-${item.status}"
+                    onchange="updStatus('${item.id}',this)">
+              ${statusOptions(item.status)}
+            </select>
+            <button class="btn btn-tiny danger" title="Remove"
+                    onclick="removeItem('${item.id}')">✕</button>
+          </div>
         </header>
         <div class="card-body">
           <div class="field">
