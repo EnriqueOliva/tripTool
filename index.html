@@ -7,45 +7,51 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      /* Canvas */
-      --bg: #faf7f2;
-      --bg-grad: radial-gradient(1200px 600px at 15% -10%, #fdece0 0%, transparent 60%),
-                 radial-gradient(800px 500px at 110% 20%, #e7f5f4 0%, transparent 55%),
-                 #faf7f2;
-      --surface: #ffffff;
-      --surface-2: #f5f1ea;
-      --border: #e9e3d7;
-      --border-2: #dfd8c8;
+      /* Canvas — dark, cool, modern */
+      --bg: #0b0b12;
+      --bg-grad: radial-gradient(900px 500px at 12% -5%, rgba(139,92,246,.22) 0%, transparent 60%),
+                 radial-gradient(900px 520px at 100% 8%, rgba(34,211,238,.16) 0%, transparent 55%),
+                 radial-gradient(700px 400px at 50% 120%, rgba(244,114,182,.09) 0%, transparent 60%),
+                 #0b0b12;
+      --surface:    #141420;
+      --surface-2:  #1a1a2a;
+      --surface-3:  #212134;
+      --border:     #262639;
+      --border-2:   #363652;
 
       /* Text */
-      --text:   #18181b;
-      --text-2: #52525b;
-      --text-3: #9c968b;
+      --text:   #f3f3f8;
+      --text-2: #a3a3b8;
+      --text-3: #6a6a82;
 
       /* Brand accents */
-      --day:           #ea6d2a;
-      --day-soft:      #fdece0;
-      --day-ring:      rgba(234,109,42,.22);
-      --transport:     #0e7c8a;
-      --transport-soft:#d9f0f2;
-      --transport-ring:rgba(14,124,138,.20);
+      --day:            #a78bfa;
+      --day-soft:       rgba(167,139,250,.14);
+      --day-ring:       rgba(167,139,250,.28);
+      --transport:      #22d3ee;
+      --transport-soft: rgba(34,211,238,.12);
+      --transport-ring: rgba(34,211,238,.26);
 
       /* Status */
-      --idea-bg:#f2eee7; --idea-fg:#6b6358;
-      --tent-bg:#fff0c2; --tent-fg:#946507;
-      --book-bg:#d5f0dd; --book-fg:#1f6f42;
+      --idea-bg: rgba(255,255,255,.06); --idea-fg: #a3a3b8;
+      --tent-bg: rgba(251,191,36,.14);  --tent-fg: #fbbf24;
+      --book-bg: rgba(74,222,128,.13);  --book-fg: #4ade80;
+
+      /* Danger / error */
+      --danger:    #fb7185;
+      --danger-bg: rgba(251,113,133,.12);
 
       /* Radii & depth */
       --r-lg: 18px;
       --r-md: 12px;
       --r-sm: 8px;
-      --shadow-sm: 0 1px 2px rgba(24,24,27,.04), 0 2px 6px rgba(24,24,27,.04);
-      --shadow-md: 0 4px 10px rgba(24,24,27,.05), 0 10px 30px rgba(24,24,27,.06);
-      --shadow-lg: 0 10px 20px rgba(24,24,27,.06), 0 24px 60px rgba(24,24,27,.09);
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.45), 0 2px 8px rgba(0,0,0,.35);
+      --shadow-md: 0 8px 24px rgba(0,0,0,.45), 0 2px 4px rgba(0,0,0,.35);
+      --shadow-lg: 0 20px 60px rgba(0,0,0,.55), 0 10px 20px rgba(0,0,0,.4);
 
       /* Motion */
       --ease: cubic-bezier(.2,.7,.2,1);
@@ -53,10 +59,11 @@
 
     * , *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    html { color-scheme: dark; }
     html, body { height: 100%; }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
       background: var(--bg-grad);
       color: var(--text);
       line-height: 1.55;
@@ -69,10 +76,10 @@
     /* ───────── Header ───────── */
     .topbar {
       position: sticky; top: 0; z-index: 50;
-      background: rgba(250,247,242,.72);
+      background: rgba(11,11,18,.72);
       backdrop-filter: saturate(140%) blur(14px);
       -webkit-backdrop-filter: saturate(140%) blur(14px);
-      border-bottom: 1px solid rgba(233,227,215,.8);
+      border-bottom: 1px solid rgba(38,38,57,.8);
     }
     .topbar-inner {
       max-width: 920px; margin: 0 auto;
@@ -81,8 +88,8 @@
     }
     .brand { display: flex; flex-direction: column; min-width: 0; }
     .brand-title {
-      font-family: 'Instrument Serif', Georgia, serif;
-      font-size: 26px; font-weight: 400; letter-spacing: -0.01em;
+      font-family: 'Bricolage Grotesque', 'Space Grotesk', sans-serif;
+      font-size: 26px; font-weight: 500; letter-spacing: -0.02em;
       color: var(--text); border: none; background: transparent; outline: none;
       padding: 0; width: 100%; max-width: 420px;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -95,7 +102,7 @@
     .btn {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 8px 14px; border-radius: 999px;
-      font: 500 13px/1 'Inter', sans-serif;
+      font: 500 13px/1 'Space Grotesk', sans-serif;
       cursor: pointer; border: 1px solid transparent;
       transition: transform .15s var(--ease), background .15s, color .15s, border-color .15s, box-shadow .15s;
       white-space: nowrap;
@@ -103,13 +110,17 @@
     .btn:hover { transform: translateY(-1px); }
     .btn:active { transform: translateY(0); }
     .btn[disabled] { opacity: .38; cursor: not-allowed; transform: none; }
-    .btn-dark { background: var(--text); color: #fff; }
-    .btn-dark:hover { background: #27272a; box-shadow: var(--shadow-md); }
+    .btn-dark {
+      background: linear-gradient(135deg, var(--day) 0%, var(--transport) 100%);
+      color: #0b0b12;
+      font-weight: 600;
+    }
+    .btn-dark:hover { box-shadow: 0 0 0 4px var(--day-ring), var(--shadow-md); }
     .btn-ghost { background: transparent; color: var(--text-2); border-color: var(--border); }
-    .btn-ghost:hover { background: var(--surface); color: var(--text); }
+    .btn-ghost:hover { background: var(--surface-2); color: var(--text); border-color: var(--border-2); }
     .btn-tiny { padding: 5px 8px; font-size: 12px; border-radius: 8px; background: transparent; color: var(--text-3); border-color: transparent; }
     .btn-tiny:hover { background: var(--surface-2); color: var(--text); transform: none; }
-    .btn-tiny.danger:hover { background: #fde2e2; color: #a01e1e; }
+    .btn-tiny.danger:hover { background: var(--danger-bg); color: var(--danger); }
 
     .status {
       font-size: 12px; color: var(--text-3);
@@ -118,8 +129,8 @@
       transition: color .15s;
     }
     .status.saving { color: var(--day); }
-    .status.saved  { color: #1f7f52; }
-    .status.err    { color: #b0293e; }
+    .status.saved  { color: var(--book-fg); }
+    .status.err    { color: var(--danger); }
 
     /* ───────── Timeline ───────── */
     .stage {
@@ -129,12 +140,22 @@
     }
 
     .intro {
-      margin-bottom: 40px;
-      font-family: 'Instrument Serif', Georgia, serif;
-      font-style: italic;
-      color: var(--text-3);
-      font-size: 18px;
+      margin-bottom: 44px;
+      font-family: 'Bricolage Grotesque', 'Space Grotesk', sans-serif;
+      font-weight: 400;
+      color: var(--text-2);
+      font-size: 22px;
+      line-height: 1.35;
+      letter-spacing: -0.01em;
       padding-left: 76px;
+      max-width: 560px;
+    }
+    .intro .accent {
+      background: linear-gradient(90deg, var(--day), var(--transport));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 500;
     }
 
     .tl {
@@ -150,8 +171,10 @@
       background: linear-gradient(
         to bottom,
         transparent 0%,
-        var(--border-2) 4%,
-        var(--border-2) 96%,
+        rgba(167,139,250,.6) 6%,
+        rgba(167,139,250,.45) 30%,
+        rgba(34,211,238,.4) 70%,
+        rgba(34,211,238,.55) 94%,
         transparent 100%
       );
       border-radius: 2px;
@@ -203,23 +226,23 @@
     .card-head {
       display: flex; align-items: center; gap: 10px;
       padding: 14px 18px;
-      background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,.85) 100%);
       border-bottom: 1px solid var(--border);
     }
-    .tl-item.is-day       .card-head { background: linear-gradient(180deg, var(--day-soft) 0%, rgba(255,244,235,.35) 100%); }
-    .tl-item.is-transport .card-head { background: linear-gradient(180deg, var(--transport-soft) 0%, rgba(217,240,242,.35) 100%); }
+    .tl-item.is-day       .card-head { background: linear-gradient(180deg, var(--day-soft) 0%, transparent 100%); }
+    .tl-item.is-transport .card-head { background: linear-gradient(180deg, var(--transport-soft) 0%, transparent 100%); }
 
     .head-kind {
       font-size: 10px; font-weight: 700;
       text-transform: uppercase; letter-spacing: .14em;
-      padding: 4px 9px; border-radius: 999px;
-      background: rgba(255,255,255,.7);
+      padding: 4px 10px; border-radius: 999px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
     }
     .tl-item.is-day       .head-kind { color: var(--day); }
     .tl-item.is-transport .head-kind { color: var(--transport); }
 
     .head-date {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Space Grotesk', sans-serif;
       font-size: 13px; font-weight: 600; color: var(--text);
       border: none; background: transparent; outline: none;
       padding: 3px 0; cursor: pointer;
@@ -256,7 +279,7 @@
       color: var(--text-3);
     }
     .inp {
-      font: 400 14px/1.5 'Inter', sans-serif;
+      font: 400 14px/1.5 'Space Grotesk', sans-serif;
       color: var(--text);
       border: none;
       border-bottom: 1.5px solid transparent;
@@ -273,14 +296,15 @@
     /* Transport mode select (styled like badge inside head) */
     .mode-sel {
       font-family: inherit;
-      font-size: 13px; font-weight: 600;
-      border: 1px solid var(--border);
-      background: #fff;
+      font-size: 13px; font-weight: 500;
+      border: 1px solid var(--border-2);
+      background: var(--surface-2);
       border-radius: 999px;
       padding: 4px 10px 4px 8px;
       color: var(--text);
       outline: none; cursor: pointer;
     }
+    .mode-sel option { background: var(--surface-2); color: var(--text); }
     .mode-sel:focus { border-color: var(--transport); }
 
     /* ───────── Add row ───────── */
@@ -292,10 +316,10 @@
       display: inline-flex; align-items: center; gap: 7px;
       padding: 10px 16px;
       border-radius: 999px;
-      background: #fff;
+      background: var(--surface);
       border: 1px dashed var(--border-2);
       color: var(--text-2);
-      font: 500 13px/1 'Inter', sans-serif;
+      font: 500 13px/1 'Space Grotesk', sans-serif;
       cursor: pointer;
       transition: all .18s var(--ease);
     }
@@ -306,24 +330,25 @@
     /* ───────── Empty ───────── */
     .empty {
       padding: 80px 24px; text-align: center; color: var(--text-3);
-      font-family: 'Instrument Serif', serif; font-style: italic; font-size: 20px;
+      font-family: 'Bricolage Grotesque', 'Space Grotesk', sans-serif; font-style: italic; font-size: 20px;
     }
 
     /* ───────── Toast ───────── */
     .toast {
       position: fixed; bottom: 26px; left: 50%;
       transform: translate(-50%, 60px); opacity: 0;
-      background: var(--text); color: #fff;
+      background: var(--surface-3); color: var(--text);
+      border: 1px solid var(--border-2);
       padding: 11px 20px; border-radius: 999px;
-      font: 500 13px 'Inter', sans-serif;
+      font: 500 13px 'Space Grotesk', sans-serif;
       box-shadow: var(--shadow-lg);
       transition: transform .35s var(--ease), opacity .22s;
       z-index: 999; pointer-events: none;
       max-width: calc(100vw - 48px);
     }
     .toast.on  { transform: translate(-50%, 0); opacity: 1; }
-    .toast.ok  { background: #1f7f52; }
-    .toast.bad { background: #b0293e; }
+    .toast.ok  { border-color: var(--book-fg); color: var(--book-fg); }
+    .toast.bad { border-color: var(--danger);  color: var(--danger); }
 
     /* ───────── Responsive ───────── */
     @media (max-width: 640px) {
@@ -360,7 +385,7 @@
 </header>
 
 <main class="stage">
-  <p class="intro">A day-by-day chronology. Scroll down to move forward in time.</p>
+  <p class="intro">A <span class="accent">day-by-day</span> chronology — scroll down to move forward in time.</p>
 
   <div class="tl" id="tl"></div>
 
