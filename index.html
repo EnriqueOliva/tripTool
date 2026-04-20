@@ -64,6 +64,7 @@
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
+      font-size: 16px;
       background: var(--bg-grad);
       color: var(--text);
       line-height: 1.55;
@@ -89,20 +90,20 @@
     .brand { display: flex; flex-direction: column; min-width: 0; }
     .brand-title {
       font-family: 'Inter', sans-serif;
-      font-size: 26px; font-weight: 500; letter-spacing: -0.02em;
+      font-size: 30px; font-weight: 600; letter-spacing: -0.02em;
       color: var(--text); border: none; background: transparent; outline: none;
-      padding: 0; width: 100%; max-width: 420px;
+      padding: 0; width: 100%; max-width: 460px;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .brand-title:focus { color: var(--day); }
-    .brand-meta { font-size: 12px; color: var(--text-3); letter-spacing: .01em; margin-top: 2px; }
+    .brand-meta { font-size: 13px; color: var(--text-3); letter-spacing: .01em; margin-top: 3px; }
 
     .toolbar { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
     .btn {
       display: inline-flex; align-items: center; gap: 6px;
-      padding: 8px 14px; border-radius: 999px;
-      font: 500 13px/1 'Inter', sans-serif;
+      padding: 9px 16px; border-radius: 999px;
+      font: 500 14px/1 'Inter', sans-serif;
       cursor: pointer; border: 1px solid transparent;
       transition: transform .15s var(--ease), background .15s, color .15s, border-color .15s, box-shadow .15s;
       white-space: nowrap;
@@ -118,14 +119,14 @@
     .btn-dark:hover { box-shadow: 0 0 0 4px var(--day-ring), var(--shadow-md); }
     .btn-ghost { background: transparent; color: var(--text-2); border-color: var(--border); }
     .btn-ghost:hover { background: var(--surface-2); color: var(--text); border-color: var(--border-2); }
-    .btn-tiny { padding: 5px 8px; font-size: 12px; border-radius: 8px; background: transparent; color: var(--text-3); border-color: transparent; }
+    .btn-tiny { padding: 6px 10px; font-size: 13px; border-radius: 8px; background: transparent; color: var(--text-3); border-color: transparent; }
     .btn-tiny:hover { background: var(--surface-2); color: var(--text); transform: none; }
     .btn-tiny.danger:hover { background: var(--danger-bg); color: var(--danger); }
 
     .status {
-      font-size: 12px; color: var(--text-3);
+      font-size: 13px; color: var(--text-3);
       display: inline-flex; align-items: center; gap: 6px;
-      min-width: 78px; padding: 0 4px;
+      min-width: 82px; padding: 0 4px;
       transition: color .15s;
     }
     .status.saving { color: var(--day); }
@@ -140,15 +141,15 @@
     }
 
     .intro {
-      margin-bottom: 44px;
+      margin-bottom: 48px;
       font-family: 'Inter', sans-serif;
       font-weight: 400;
       color: var(--text-2);
-      font-size: 22px;
+      font-size: 25px;
       line-height: 1.35;
-      letter-spacing: -0.01em;
+      letter-spacing: -0.015em;
       padding-left: 76px;
-      max-width: 560px;
+      max-width: 620px;
     }
     .intro .accent {
       background: linear-gradient(90deg, var(--day), var(--transport));
@@ -185,8 +186,8 @@
       padding: 4px 0 4px 76px;
       margin-bottom: 22px;
       opacity: 0;
-      transform: translateY(14px);
-      transition: opacity .55s var(--ease), transform .55s var(--ease);
+      transform: translateY(12px);
+      transition: opacity .35s var(--ease), transform .35s var(--ease);
     }
     .tl-item.visible { opacity: 1; transform: translateY(0); }
 
@@ -237,9 +238,9 @@
     .date-wrap { position: relative; display: inline-flex; }
     .head-date {
       font-family: 'Inter', sans-serif;
-      font-size: 13px; font-weight: 600; color: var(--text);
+      font-size: 15px; font-weight: 600; color: var(--text);
       border: none; background: transparent; outline: none;
-      padding: 4px 10px; cursor: pointer; border-radius: 8px;
+      padding: 5px 12px; cursor: pointer; border-radius: 8px;
       flex: 0 0 auto;
       transition: background .15s, color .15s;
     }
@@ -259,9 +260,9 @@
     }
 
     .badge {
-      font-size: 10px; font-weight: 700;
+      font-size: 11px; font-weight: 700;
       text-transform: uppercase; letter-spacing: .1em;
-      padding: 4px 10px; border-radius: 999px;
+      padding: 5px 12px; border-radius: 999px;
       border: none; outline: none; cursor: pointer;
       appearance: none; -webkit-appearance: none;
       font-family: inherit;
@@ -279,17 +280,17 @@
     .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
     .field.span2 { grid-column: 1 / -1; }
     .label {
-      font-size: 10px; font-weight: 600;
+      font-size: 11px; font-weight: 600;
       text-transform: uppercase; letter-spacing: .11em;
       color: var(--text-3);
     }
     .inp {
-      font: 400 14px/1.5 'Inter', sans-serif;
+      font: 400 16px/1.5 'Inter', sans-serif;
       color: var(--text);
       border: none;
       border-bottom: 1.5px solid transparent;
       background: transparent;
-      outline: none; padding: 3px 0;
+      outline: none; padding: 4px 0;
       width: 100%; min-width: 0;
       transition: border-color .15s;
     }
@@ -308,10 +309,10 @@
       padding: 12px 18px 4px;
     }
     .transport-label {
-      font-size: 10px; font-weight: 700;
+      font-size: 12px; font-weight: 700;
       text-transform: uppercase; letter-spacing: .14em;
       color: var(--transport);
-      display: inline-flex; align-items: center; gap: 6px;
+      display: inline-flex; align-items: center; gap: 7px;
     }
     .transport-label::before {
       content: "";
@@ -321,23 +322,23 @@
     }
     .transport-remove {
       margin-left: auto;
-      font-size: 11px; color: var(--text-3);
+      font-size: 12px; color: var(--text-3);
       background: transparent; border: none; cursor: pointer;
-      padding: 4px 8px; border-radius: 6px;
+      padding: 5px 10px; border-radius: 6px;
       font-family: inherit;
     }
     .transport-remove:hover { color: var(--danger); background: var(--danger-bg); }
 
     /* Toggle button — shown when transport isn't added yet */
     .transport-toggle {
-      display: inline-flex; align-items: center; gap: 6px;
-      margin: 8px 18px 16px;
-      padding: 8px 14px;
+      display: inline-flex; align-items: center; gap: 7px;
+      margin: 10px 18px 18px;
+      padding: 10px 16px;
       background: transparent;
       border: 1px dashed var(--border-2);
       border-radius: 999px;
       color: var(--text-2);
-      font: 500 12px/1 'Inter', sans-serif;
+      font: 500 14px/1 'Inter', sans-serif;
       cursor: pointer;
       transition: all .18s var(--ease);
     }
@@ -350,11 +351,11 @@
     /* Transport mode select (styled like badge inside head) */
     .mode-sel {
       font-family: inherit;
-      font-size: 13px; font-weight: 500;
+      font-size: 14px; font-weight: 500;
       border: 1px solid var(--border-2);
       background: var(--surface-2);
       border-radius: 999px;
-      padding: 4px 10px 4px 8px;
+      padding: 5px 12px 5px 10px;
       color: var(--text);
       outline: none; cursor: pointer;
     }
@@ -368,12 +369,12 @@
     }
     .add-btn {
       display: inline-flex; align-items: center; gap: 7px;
-      padding: 10px 16px;
+      padding: 12px 20px;
       border-radius: 999px;
       background: var(--surface);
       border: 1px dashed var(--border-2);
       color: var(--text-2);
-      font: 500 13px/1 'Inter', sans-serif;
+      font: 500 15px/1 'Inter', sans-serif;
       cursor: pointer;
       transition: all .18s var(--ease);
     }
@@ -384,7 +385,7 @@
     /* ───────── Empty ───────── */
     .empty {
       padding: 80px 24px; text-align: center; color: var(--text-3);
-      font-family: 'Inter', sans-serif; font-style: italic; font-size: 20px;
+      font-family: 'Inter', sans-serif; font-style: italic; font-size: 22px;
     }
 
     /* ───────── Loader ───────── */
@@ -394,8 +395,8 @@
       background-image: var(--bg-grad);
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      gap: 22px;
-      transition: opacity .45s var(--ease), visibility .45s;
+      gap: 18px;
+      transition: opacity .25s var(--ease), visibility .25s;
     }
     .loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
@@ -412,9 +413,14 @@
       50%      { transform: scale(1.6); box-shadow: 0 0 0 14px rgba(167,139,250,0), 0 0 60px var(--transport-ring); background: var(--transport); }
     }
     .loader-text {
-      font-size: 13px; font-weight: 500; color: var(--text-2);
+      font-size: 14px; font-weight: 500; color: var(--text-2);
       letter-spacing: .02em;
     }
+    .loader-sub {
+      font-size: 12px; color: var(--text-3); margin-top: -12px;
+      opacity: 0; transition: opacity .4s;
+    }
+    .loader-sub.show { opacity: 1; }
 
     /* Lock scroll while loader is up */
     body.loading { overflow: hidden; }
@@ -425,8 +431,8 @@
       transform: translate(-50%, 60px); opacity: 0;
       background: var(--surface-3); color: var(--text);
       border: 1px solid var(--border-2);
-      padding: 11px 20px; border-radius: 999px;
-      font: 500 13px 'Inter', sans-serif;
+      padding: 12px 22px; border-radius: 999px;
+      font: 500 14px 'Inter', sans-serif;
       box-shadow: var(--shadow-lg);
       transition: transform .35s var(--ease), opacity .22s;
       z-index: 999; pointer-events: none;
@@ -460,16 +466,16 @@
       .stage { padding: 24px 14px 96px; }
       .intro {
         padding-left: 54px;
-        font-size: 17px;
+        font-size: 19px;
         margin-bottom: 32px;
         line-height: 1.4;
       }
 
       .tl::before { left: 24px; }
-      .tl-node    { left: 12px; top: 16px; width: 24px; height: 24px; font-size: 11px; }
+      .tl-node    { left: 12px; top: 16px; width: 26px; height: 26px; font-size: 12px; }
       .tl-item    { padding-left: 54px; margin-bottom: 18px; }
       .add-row    { padding-left: 54px; flex-wrap: wrap; gap: 8px; }
-      .add-btn    { padding: 10px 14px; font-size: 13px; width: 100%; justify-content: center; }
+      .add-btn    { padding: 12px 18px; font-size: 14px; width: 100%; justify-content: center; }
 
       .card-head {
         padding: 12px 14px;
@@ -482,20 +488,17 @@
       }
       .field.span2 { grid-column: 1; }
 
-      .head-kind { padding: 3px 8px; font-size: 9px; letter-spacing: .12em; }
-      .head-date { font-size: 13px; }
-      .badge     { padding: 4px 10px; font-size: 10px; }
-      .mode-sel  { font-size: 12px; padding: 4px 8px 4px 6px; max-width: 140px; }
+      .head-date { font-size: 14px; padding: 5px 10px; }
+      .badge     { padding: 5px 12px; font-size: 11px; }
+      .mode-sel  { font-size: 13px; padding: 5px 10px 5px 8px; max-width: 150px; }
 
-      /* On very small screens, let the mode selector wrap to its own line */
-      .tl-item.is-transport .mode-sel { flex-basis: 100%; max-width: none; }
+      /* Keep inputs ≥16px to avoid iOS zoom-on-focus */
+      .inp { font-size: 16px; }
 
-      .inp { font-size: 15px; } /* 15px+ avoids iOS zoom-on-focus */
+      .btn-tiny { padding: 8px 10px; min-width: 36px; font-size: 13px; }
 
-      .btn-tiny { padding: 8px 10px; min-width: 36px; }
-
-      .brand-title { font-size: 20px; }
-      .brand-meta  { font-size: 11px; }
+      .brand-title { font-size: 24px; }
+      .brand-meta  { font-size: 12px; }
 
       .topbar-inner { padding: 10px 14px; }
     }
@@ -506,7 +509,8 @@
       .tl-node    { left: 8px; }
       .tl-item    { padding-left: 48px; }
       .add-row    { padding-left: 48px; }
-      .intro      { padding-left: 48px; font-size: 16px; }
+      .intro      { padding-left: 48px; font-size: 17px; }
+      .brand-title { font-size: 22px; }
     }
   </style>
 </head>
@@ -515,6 +519,7 @@
 <div class="loader" id="loader">
   <div class="loader-dot"></div>
   <p class="loader-text">Loading your trip…</p>
+  <p class="loader-sub" id="loaderSub">Server is waking up — just a moment</p>
 </div>
 
 <header class="topbar">
@@ -552,6 +557,8 @@
   const BIN_KEY  = '$2a$10$I4VrBBHY70cCt0j8YaGuNOfCYbsoQx7yxf/tcCtn8dTdR7yNBRVxq';
   const BIN_URL  = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
   const SAVE_DEBOUNCE_MS = 10000;
+  const LOAD_TIMEOUT_MS  = 8000;
+  const LOAD_SLOW_HINT_MS = 2500;
 
   const MODES = {
     flight: { icon: '✈️', label: 'Flight' },
@@ -660,8 +667,18 @@
   // ── Remote ───────────────────────────────────────────────────
   async function load() {
     setState('saving'); setStatusText('↓ loading…');
+    const controller = new AbortController();
+    const timeout   = setTimeout(() => controller.abort(), LOAD_TIMEOUT_MS);
+    const slowHint  = setTimeout(() => {
+      const sub = document.getElementById('loaderSub');
+      if (sub) sub.classList.add('show');
+    }, LOAD_SLOW_HINT_MS);
+
     try {
-      const res  = await fetch(`${BIN_URL}/latest`, { headers: { 'X-Master-Key': BIN_KEY } });
+      const res  = await fetch(`${BIN_URL}/latest`, {
+        headers: { 'X-Master-Key': BIN_KEY },
+        signal:  controller.signal,
+      });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       const saved = data?.record?.items;
@@ -680,8 +697,13 @@
       console.error(e);
       loadLocal();
       setState('err');
-      toast('Could not reach server — showing local data', 'bad');
+      const msg = e.name === 'AbortError'
+        ? 'Server too slow — showing local data'
+        : 'Could not reach server — showing local data';
+      toast(msg, 'bad');
     } finally {
+      clearTimeout(timeout);
+      clearTimeout(slowHint);
       hideLoader();
     }
   }
@@ -821,8 +843,7 @@
           </div>
           <div class="field">
             <label class="label">Time</label>
-            <input class="inp" type="text" value="${x(item.time)}"
-                   placeholder="e.g. Morning"
+            <input class="inp" type="time" value="${x(item.time)}"
                    onchange="upd('${item.id}','time',this.value)" />
           </div>
           <div class="field span2">
