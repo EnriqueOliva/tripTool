@@ -517,6 +517,63 @@
       font-style: italic; font-size: 22px;
     }
 
+    /* ───────── Unsaved warning strip ───────── */
+    .unsaved-strip {
+      display: none;
+      align-items: center; justify-content: center; gap: 12px;
+      background: rgba(251,191,36,.08);
+      border-top: 1px solid rgba(251,191,36,.25);
+      padding: 10px 24px;
+      color: var(--tent-fg);
+      font-size: 14px; font-weight: 600;
+      letter-spacing: .01em;
+    }
+    .unsaved-strip.show { display: flex; }
+    .unsaved-strip.err  { background: rgba(251,113,133,.08); border-top-color: rgba(251,113,133,.3); color: var(--danger); }
+    .unsaved-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 0 0 currentColor;
+      animation: dirty-pulse 1.6s var(--ease) infinite;
+    }
+    @keyframes dirty-pulse {
+      0%   { box-shadow: 0 0 0 0   rgba(251,191,36,.55); }
+      60%  { box-shadow: 0 0 0 9px rgba(251,191,36,0); }
+      100% { box-shadow: 0 0 0 0   rgba(251,191,36,0); }
+    }
+
+    /* ───────── Save confirmation (big center checkmark) ───────── */
+    .save-confirm {
+      position: fixed; inset: 0;
+      display: grid; place-items: center;
+      pointer-events: none;
+      z-index: 300;
+      opacity: 0;
+    }
+    .save-confirm.on { animation: save-confirm-anim 1.4s var(--ease) forwards; }
+    .save-confirm-box {
+      width: 140px; height: 140px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(74,222,128,.18), rgba(74,222,128,.06));
+      border: 2px solid var(--book-fg);
+      display: grid; place-items: center;
+      color: var(--book-fg);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 80px rgba(74,222,128,.35), 0 20px 70px rgba(0,0,0,.55);
+    }
+    .save-confirm-box svg { animation: check-draw .6s .15s var(--ease) both; }
+    @keyframes save-confirm-anim {
+      0%   { opacity: 0; transform: scale(.55); }
+      18%  { opacity: 1; transform: scale(1.08); }
+      28%  { transform: scale(1); }
+      72%  { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(1.18); }
+    }
+    @keyframes check-draw {
+      from { stroke-dashoffset: 30; opacity: 0; }
+      to   { stroke-dashoffset: 0;  opacity: 1; }
+    }
+
     /* ───────── Loader ───────── */
     .loader {
       position: fixed; inset: 0; z-index: 200;
@@ -645,7 +702,22 @@
       <button class="btn btn-dark"  onclick="saveToSheets()">Save now</button>
     </div>
   </div>
+  <div class="unsaved-strip" id="unsavedStrip">
+    <span class="unsaved-dot"></span>
+    <span class="unsaved-text">Unsaved changes</span>
+  </div>
 </header>
+
+<div class="save-confirm" id="saveConfirm">
+  <div class="save-confirm-box">
+    <svg width="68" height="68" viewBox="0 0 24 24" fill="none">
+      <path d="M5 12.5l4.5 4.5L19 7"
+            stroke="currentColor" stroke-width="3"
+            stroke-linecap="round" stroke-linejoin="round"
+            pathLength="30" stroke-dasharray="30" />
+    </svg>
+  </div>
+</div>
 
 <div class="range-bar">
   <span class="range-label">Trip</span>
@@ -913,6 +985,7 @@
       if (dirty) scheduleSave();
       else {
         setState('saved');
+        flashSaveConfirm();
         setTimeout(() => { if (!dirty && !saving) setState('idle'); }, 3000);
       }
     } catch (e) {
@@ -932,7 +1005,32 @@
     await load();
   }
 
-  function setState(s) { setStatusClass(s); setStatusText(stateLabel(s)); }
+  function setState(s) {
+    setStatusClass(s);
+    setStatusText(stateLabel(s));
+    updateUnsavedStrip(s);
+    updateTitle();
+  }
+  function updateUnsavedStrip(s) {
+    const el   = document.getElementById('unsavedStrip');
+    const text = el?.querySelector('.unsaved-text');
+    if (!el) return;
+    el.classList.remove('show', 'err');
+    if (s === 'dirty')  { el.classList.add('show'); text.textContent = 'Unsaved changes'; }
+    else if (s === 'saving') { el.classList.add('show'); text.textContent = 'Saving…'; }
+    else if (s === 'err')    { el.classList.add('show', 'err'); text.textContent = 'Save failed — will retry'; }
+  }
+  function updateTitle() {
+    const base = state.title || 'Our Trip';
+    document.title = (dirty || saving) ? `• ${base}` : base;
+  }
+  function flashSaveConfirm() {
+    const el = document.getElementById('saveConfirm');
+    if (!el) return;
+    el.classList.remove('on');
+    void el.offsetWidth;   // restart animation
+    el.classList.add('on');
+  }
   function stateLabel(s) {
     return s === 'idle' ? '' : s === 'dirty' ? '· unsaved' :
            s === 'saving' ? '↑ saving…' : s === 'saved' ? '✓ saved' :
