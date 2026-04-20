@@ -653,7 +653,7 @@
     const base = { id: uid(), type, date, status: 'idea', notes: '' };
     if (type === 'activity')  return { ...base, location: '', time: '', activity: '' };
     if (type === 'transport') return { ...base, mode: 'flight', from: '', to: '', departTime: '', arriveTime: '', confirmation: '' };
-    if (type === 'hotel')     return { ...base, name: '', address: '', checkInTime: '', checkOutDate: '', confirmation: '' };
+    if (type === 'hotel')     return { ...base, name: '', address: '', checkInDate: '', checkInTime: '', checkOutDate: '', checkOutTime: '', confirmation: '' };
     return base;
   }
 
@@ -724,7 +724,10 @@
     if (base.type === 'hotel') return {
       ...base,
       name: c.name || '', address: c.address || '',
-      checkInTime: c.checkInTime || '', checkOutDate: c.checkOutDate || '',
+      checkInDate:  c.checkInDate  || '',
+      checkInTime:  c.checkInTime  || '',
+      checkOutDate: c.checkOutDate || '',
+      checkOutTime: c.checkOutTime || '',
       confirmation: c.confirmation || '',
     };
     return base;
@@ -1136,22 +1139,21 @@
   function hotelBody(c) {
     return `
       <div class="card-body">
-        <div class="field">
+        <div class="field span2">
           <label class="label">Hotel name</label>
           <input class="inp" type="text" value="${x(c.name)}"
                  placeholder="e.g. Hotel Eiffel"
                  onchange="upd('${c.id}','name',this.value)" />
         </div>
         <div class="field">
+          <label class="label">Check-in date</label>
+          <input class="inp" type="date" value="${x(c.checkInDate)}"
+                 onchange="upd('${c.id}','checkInDate',this.value)" />
+        </div>
+        <div class="field">
           <label class="label">Check-in time</label>
           <input class="inp" type="time" value="${x(c.checkInTime)}"
                  onchange="upd('${c.id}','checkInTime',this.value)" />
-        </div>
-        <div class="field span2">
-          <label class="label">Address</label>
-          <input class="inp" type="text" value="${x(c.address)}"
-                 placeholder="e.g. 5 Av. Anatole France, Paris"
-                 onchange="upd('${c.id}','address',this.value)" />
         </div>
         <div class="field">
           <label class="label">Check-out date</label>
@@ -1159,6 +1161,17 @@
                  onchange="upd('${c.id}','checkOutDate',this.value)" />
         </div>
         <div class="field">
+          <label class="label">Check-out time</label>
+          <input class="inp" type="time" value="${x(c.checkOutTime)}"
+                 onchange="upd('${c.id}','checkOutTime',this.value)" />
+        </div>
+        <div class="field span2">
+          <label class="label">Address</label>
+          <input class="inp" type="text" value="${x(c.address)}"
+                 placeholder="e.g. 5 Av. Anatole France, Paris"
+                 onchange="upd('${c.id}','address',this.value)" />
+        </div>
+        <div class="field span2">
           <label class="label">Confirmation</label>
           <input class="inp" type="text" value="${x(c.confirmation)}"
                  placeholder="e.g. Booking.com · ABC123"
