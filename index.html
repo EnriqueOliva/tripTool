@@ -749,10 +749,10 @@
 
 <script>
   // ── Config ───────────────────────────────────────────────────
-  const LS        = 'tp_state_v3';
-  const BIN_ID    = '69e6843eaaba8821971d19a9';
-  const BIN_KEY   = '$2a$10$I4VrBBHY70cCt0j8YaGuNOfCYbsoQx7yxf/tcCtn8dTdR7yNBRVxq';
-  const BIN_URL   = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+  const LS           = 'tp_state_v3';
+  const FIREBASE_URL = 'https://triptool-64f1f-default-rtdb.firebaseio.com';
+  const DATA_PATH    = '/trip.json';
+  const REMOTE_URL   = FIREBASE_URL + DATA_PATH;
   const SAVE_DEBOUNCE_MS  = 10000;
   const LOAD_SLOW_HINT_MS = 2500;
 
@@ -930,7 +930,7 @@
     document.body.classList.remove('loading');
   }
 
-  // ── Remote ───────────────────────────────────────────────────
+  // ── Remote (Firebase Realtime Database) ──────────────────────
   async function load() {
     setState('saving'); setStatusText('↓ loading…');
     const slowHint = setTimeout(() => {
@@ -938,12 +938,10 @@
     }, LOAD_SLOW_HINT_MS);
 
     try {
-      const res  = await fetch(`${BIN_URL}/latest`, {
-        headers: { 'X-Master-Key': BIN_KEY },
-      });
+      const res  = await fetch(REMOTE_URL);
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
-      state = migrate(data?.record || {});
+      state = migrate(data || {});
       history = [];
       document.getElementById('undoBtn').disabled = true;
       dirty = false;
@@ -975,14 +973,13 @@
     const snapshot = JSON.stringify(state);
     setState('saving');
     try {
-      const res = await fetch(BIN_URL, {
+      const res = await fetch(REMOTE_URL, {
         method:  'PUT',
-        headers: { 'Content-Type': 'application/json', 'X-Master-Key': BIN_KEY },
+        headers: { 'Content-Type': 'application/json' },
         body:    snapshot,
       });
       if (!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
-      if (!data?.record) throw new Error('Unexpected response');
+      await res.json();
       saving = false;
       if (dirty) scheduleSave();
       else {
