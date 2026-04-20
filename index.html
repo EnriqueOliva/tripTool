@@ -409,6 +409,24 @@
       border-color: var(--danger);
       background: var(--danger-bg);
     }
+
+    .inline-add-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 14px;
+      background: transparent;
+      border: 1px dashed var(--border-2);
+      border-radius: 999px;
+      color: var(--text-3);
+      font: 500 14px/1 'Inter', sans-serif;
+      cursor: pointer;
+      align-self: flex-start;
+      transition: all .15s var(--ease);
+    }
+    .inline-add-btn:hover {
+      border-color: var(--activity);
+      color: var(--activity);
+      background: var(--activity-soft);
+    }
     .card.type-activity  .inp:focus { border-bottom-color: var(--activity); }
     .card.type-transport .inp:focus { border-bottom-color: var(--transport); }
     .card.type-hotel     .inp:focus { border-bottom-color: var(--hotel); }
@@ -712,7 +730,7 @@
 
   function blankCard(type, date = '') {
     const base = { id: uid(), type, date, status: 'idea', notes: '' };
-    if (type === 'activity')  return { ...base, location: '', time: '', activity: '' };
+    if (type === 'activity')  return { ...base, location: '', activity: '' };
     if (type === 'transport') return { ...base, mode: 'flight', from: '', to: '', departTime: '', arriveTime: '', confirmation: '', confirmation2: '' };
     if (type === 'hotel')     return { ...base, name: '', address: '', checkInDate: '', checkInTime: '', checkOutDate: '', checkOutTime: '', confirmation: '' };
     return base;
@@ -776,7 +794,11 @@
       status: c.status || 'idea',
       notes:  c.notes  || '',
     };
-    if (base.type === 'activity')  return { ...base, location: c.location || '', time: c.time || '', activity: c.activity || '' };
+    if (base.type === 'activity') {
+      const out = { ...base, location: c.location || '', activity: c.activity || '' };
+      if (c.time !== undefined && c.time !== null) out.time = c.time;
+      return out;
+    }
     if (base.type === 'transport') return {
       ...base,
       mode: c.mode || 'flight',
@@ -1138,14 +1160,20 @@
                  placeholder="e.g. Paris"
                  onchange="upd('${c.id}','location',this.value)" />
         </div>
-        <div class="field">
-          <label class="label">Time</label>
-          <div class="inp-row">
-            <input class="inp" type="time" value="${x(c.time)}"
-                   onchange="upd('${c.id}','time',this.value)" />
-            ${c.time ? `<button class="inp-clear" title="Clear time" onclick="upd('${c.id}','time',''); render()">×</button>` : ''}
+        ${c.time === undefined || c.time === null ? `
+          <div class="field">
+            <button class="inline-add-btn" onclick="addField('${c.id}','time','')">＋ Add time</button>
           </div>
-        </div>
+        ` : `
+          <div class="field">
+            <label class="label">Time</label>
+            <div class="inp-row">
+              <input class="inp" type="time" value="${x(c.time)}"
+                     onchange="upd('${c.id}','time',this.value)" />
+              <button class="inp-clear" title="Remove time" onclick="deleteField('${c.id}','time')">×</button>
+            </div>
+          </div>
+        `}
         <div class="field span2">
           <label class="label">Activity</label>
           <input class="inp" type="text" value="${x(c.activity)}"
@@ -1288,6 +1316,19 @@
     pushHistory();
     state.cards = state.cards.map(c => c.id === id ? { ...c, [field]: val } : c);
     updateMeta(); saveLocal(); scheduleSave();
+  }
+  function deleteField(id, field) {
+    pushHistory();
+    state.cards = state.cards.map(c => {
+      if (c.id !== id) return c;
+      const copy = { ...c }; delete copy[field]; return copy;
+    });
+    render(); scheduleSave();
+  }
+  function addField(id, field, initial = '') {
+    pushHistory();
+    state.cards = state.cards.map(c => c.id === id ? { ...c, [field]: initial } : c);
+    render(); scheduleSave();
   }
   function updStatus(id, sel) {
     sel.className = `badge badge-${sel.value}`;
