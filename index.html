@@ -202,13 +202,14 @@
       z-index: 1;
       transition: box-shadow .25s var(--ease), transform .25s var(--ease);
     }
-    .tl-item.is-day .tl-node {
+    .tl-item .tl-node {
       border: 2px solid var(--day);
       box-shadow: 0 0 0 6px var(--day-ring);
     }
-    .tl-item.is-transport .tl-node {
+    .tl-item.has-transport .tl-node {
       border: 2px solid var(--transport);
       box-shadow: 0 0 0 6px var(--transport-ring);
+      font-size: 13px;
     }
     .tl-item:hover .tl-node { transform: scale(1.08); }
 
@@ -228,18 +229,10 @@
       padding: 14px 18px;
       border-bottom: 1px solid var(--border);
     }
-    .tl-item.is-day       .card-head { background: linear-gradient(180deg, var(--day-soft) 0%, transparent 100%); }
-    .tl-item.is-transport .card-head { background: linear-gradient(180deg, var(--transport-soft) 0%, transparent 100%); }
-
-    .head-kind {
-      font-size: 10px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: .14em;
-      padding: 4px 10px; border-radius: 999px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid var(--border);
+    .card-head { background: linear-gradient(180deg, var(--day-soft) 0%, transparent 100%); }
+    .tl-item.has-transport .card-head {
+      background: linear-gradient(135deg, var(--day-soft) 0%, var(--transport-soft) 100%);
     }
-    .tl-item.is-day       .head-kind { color: var(--day); }
-    .tl-item.is-transport .head-kind { color: var(--transport); }
 
     .head-date {
       font-family: 'Inter', sans-serif;
@@ -293,9 +286,58 @@
       transition: border-color .15s;
     }
     .inp:focus { border-bottom-color: var(--day); }
-    .tl-item.is-transport .inp:focus { border-bottom-color: var(--transport); }
+    .transport .inp:focus { border-bottom-color: var(--transport); }
     .inp::placeholder { color: var(--text-3); }
     textarea.inp { resize: none; min-height: 40px; line-height: 1.55; font-family: inherit; }
+
+    /* ── Transport sub-section ── */
+    .transport {
+      border-top: 1px dashed var(--border-2);
+      background: linear-gradient(180deg, transparent 0%, var(--transport-soft) 100%);
+    }
+    .transport-head {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      padding: 12px 18px 4px;
+    }
+    .transport-label {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .14em;
+      color: var(--transport);
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .transport-label::before {
+      content: "";
+      display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--transport);
+      box-shadow: 0 0 0 3px var(--transport-ring);
+    }
+    .transport-remove {
+      margin-left: auto;
+      font-size: 11px; color: var(--text-3);
+      background: transparent; border: none; cursor: pointer;
+      padding: 4px 8px; border-radius: 6px;
+      font-family: inherit;
+    }
+    .transport-remove:hover { color: var(--danger); background: var(--danger-bg); }
+
+    /* Toggle button — shown when transport isn't added yet */
+    .transport-toggle {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin: 8px 18px 16px;
+      padding: 8px 14px;
+      background: transparent;
+      border: 1px dashed var(--border-2);
+      border-radius: 999px;
+      color: var(--text-2);
+      font: 500 12px/1 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all .18s var(--ease);
+    }
+    .transport-toggle:hover {
+      border-color: var(--transport);
+      color: var(--transport);
+      background: var(--transport-soft);
+    }
 
     /* Transport mode select (styled like badge inside head) */
     .mode-sel {
@@ -336,6 +378,38 @@
       padding: 80px 24px; text-align: center; color: var(--text-3);
       font-family: 'Inter', sans-serif; font-style: italic; font-size: 20px;
     }
+
+    /* ───────── Loader ───────── */
+    .loader {
+      position: fixed; inset: 0; z-index: 200;
+      background: var(--bg);
+      background-image: var(--bg-grad);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 22px;
+      transition: opacity .45s var(--ease), visibility .45s;
+    }
+    .loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    .loader-dot {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--day);
+      box-shadow:
+        0 0 0 0 var(--day-ring),
+        0 0 40px var(--day-ring);
+      animation: loader-pulse 1.3s var(--ease) infinite;
+    }
+    @keyframes loader-pulse {
+      0%, 100% { transform: scale(1);   box-shadow: 0 0 0 0   var(--day-ring), 0 0 40px var(--day-ring); background: var(--day); }
+      50%      { transform: scale(1.6); box-shadow: 0 0 0 14px rgba(167,139,250,0), 0 0 60px var(--transport-ring); background: var(--transport); }
+    }
+    .loader-text {
+      font-size: 13px; font-weight: 500; color: var(--text-2);
+      letter-spacing: .02em;
+    }
+
+    /* Lock scroll while loader is up */
+    body.loading { overflow: hidden; }
 
     /* ───────── Toast ───────── */
     .toast {
@@ -428,7 +502,12 @@
     }
   </style>
 </head>
-<body>
+<body class="loading">
+
+<div class="loader" id="loader">
+  <div class="loader-dot"></div>
+  <p class="loader-text">Loading your trip…</p>
+</div>
 
 <header class="topbar">
   <div class="topbar-inner">
@@ -451,8 +530,7 @@
   <div class="tl" id="tl"></div>
 
   <div class="add-row">
-    <button class="add-btn day"       onclick="addDay()">＋ Add day</button>
-    <button class="add-btn transport" onclick="addTransport()">＋ Add transport</button>
+    <button class="add-btn day" onclick="addEntry()">＋ Add entry</button>
   </div>
 </main>
 
@@ -512,10 +590,16 @@
 
   function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 5); }
 
-  function seed() {
-    return [
-      { id: uid(), type: 'day', date: '', city: '', activity: '', time: '', notes: '', status: 'idea' },
-    ];
+  function seed() { return [blank()]; }
+
+  function blank() {
+    return {
+      id: uid(),
+      date: '', city: '', activity: '', time: '', notes: '', status: 'idea',
+      hasTransport: false,
+      mode: 'flight', from: '', to: '',
+      departTime: '', arriveTime: '', confirmation: '',
+    };
   }
 
   // ── Local fallback ───────────────────────────────────────────
@@ -524,17 +608,46 @@
       const s = localStorage.getItem(LS);
       items = s ? JSON.parse(s) : seed();
     } catch { items = seed(); }
-    // migrate legacy items
     items = items.map(migrate);
     render();
   }
 
+  // Accepts:
+  //   - new unified entries (pass through)
+  //   - legacy { type:'day', ... }
+  //   - legacy { type:'transport', from, to, ... }  → folded into an entry with hasTransport=true
   function migrate(it) {
-    if (!it.type) it.type = 'day';
-    return it;
+    const base = {
+      id: it.id || uid(),
+      date: it.date || '',
+      city: it.city || '',
+      activity: it.activity || '',
+      time: it.time || '',
+      notes: it.notes || '',
+      status: it.status || 'idea',
+      hasTransport: !!it.hasTransport,
+      mode: it.mode || 'flight',
+      from: it.from || '',
+      to: it.to || '',
+      departTime: it.departTime || '',
+      arriveTime: it.arriveTime || '',
+      confirmation: it.confirmation || '',
+    };
+    if (it.type === 'transport') {
+      base.hasTransport = true;
+      base.city = base.city || it.to || '';
+      base.time = base.time || it.departTime || '';
+    }
+    return base;
   }
 
   function saveLocal() { localStorage.setItem(LS, JSON.stringify(items)); }
+
+  // ── Loader overlay ───────────────────────────────────────────
+  function hideLoader() {
+    document.getElementById('loader').classList.add('hidden');
+    document.body.classList.remove('loading');
+  }
 
   // ── Remote ───────────────────────────────────────────────────
   async function load() {
@@ -550,7 +663,6 @@
         document.getElementById('undoBtn').disabled = true;
         dirty = false;
         render();
-        toast('Loaded', 'ok');
         setState('idle');
       } else {
         loadLocal();
@@ -561,6 +673,8 @@
       loadLocal();
       setState('err');
       toast('Could not reach server — showing local data', 'bad');
+    } finally {
+      hideLoader();
     }
   }
 
@@ -642,9 +756,7 @@
     }
 
     const ordered = sortItems(items);
-    ordered.forEach(item => {
-      tl.appendChild(item.type === 'transport' ? renderTransport(item) : renderDay(item));
-    });
+    ordered.forEach(item => tl.appendChild(renderCard(item)));
 
     // reveal on scroll
     document.querySelectorAll('.tl-item').forEach(el => io.observe(el));
@@ -664,14 +776,16 @@
     });
   }
 
-  function renderDay(item) {
+  function renderCard(item) {
     const el = document.createElement('article');
-    el.className = 'tl-item is-day';
+    el.className = 'tl-item' + (item.hasTransport ? ' has-transport' : '');
+    const mode = MODES[item.mode] || MODES.other;
+    const nodeIcon = item.hasTransport ? mode.icon : '·';
+
     el.innerHTML = `
-      <div class="tl-node">☀</div>
+      <div class="tl-node">${nodeIcon}</div>
       <div class="card">
         <header class="card-head">
-          <span class="head-kind">Day</span>
           <input class="head-date" type="date" value="${item.date}"
                  onchange="upd('${item.id}','date',this.value)" />
           <div class="head-right">
@@ -679,19 +793,20 @@
                     onchange="updStatus('${item.id}',this)">
               ${statusOptions(item.status)}
             </select>
-            <button class="btn btn-tiny danger" title="Remove"
+            <button class="btn btn-tiny danger" title="Remove entry"
                     onclick="removeItem('${item.id}')">✕</button>
           </div>
         </header>
+
         <div class="card-body">
           <div class="field">
-            <label class="label">City / Destination</label>
+            <label class="label">Location</label>
             <input class="inp" type="text" value="${x(item.city)}"
                    placeholder="e.g. Paris"
                    onchange="upd('${item.id}','city',this.value)" />
           </div>
           <div class="field">
-            <label class="label">Time of day</label>
+            <label class="label">Time</label>
             <input class="inp" type="text" value="${x(item.time)}"
                    placeholder="e.g. Morning"
                    onchange="upd('${item.id}','time',this.value)" />
@@ -709,35 +824,28 @@
                       onchange="upd('${item.id}','notes',this.value)">${x(item.notes)}</textarea>
           </div>
         </div>
+
+        ${item.hasTransport ? renderTransportSection(item) : `
+          <button class="transport-toggle" onclick="enableTransport('${item.id}')">
+            ＋ Add transport details
+          </button>
+        `}
       </div>`;
     return el;
   }
 
-  function renderTransport(item) {
-    const mode = MODES[item.mode] || MODES.other;
-    const el = document.createElement('article');
-    el.className = 'tl-item is-transport';
-    el.innerHTML = `
-      <div class="tl-node">${mode.icon}</div>
-      <div class="card">
-        <header class="card-head">
-          <span class="head-kind">${mode.label}</span>
-          <input class="head-date" type="date" value="${item.date}"
-                 onchange="upd('${item.id}','date',this.value)" />
+  function renderTransportSection(item) {
+    return `
+      <div class="transport">
+        <div class="transport-head">
+          <span class="transport-label">Transport</span>
           <select class="mode-sel" onchange="upd('${item.id}','mode',this.value); render()">
             ${Object.entries(MODES).map(([k,v]) =>
               `<option value="${k}" ${item.mode===k?'selected':''}>${v.icon}  ${v.label}</option>`
             ).join('')}
           </select>
-          <div class="head-right">
-            <select class="badge badge-${item.status}"
-                    onchange="updStatus('${item.id}',this)">
-              ${statusOptions(item.status)}
-            </select>
-            <button class="btn btn-tiny danger" title="Remove"
-                    onclick="removeItem('${item.id}')">✕</button>
-          </div>
-        </header>
+          <button class="transport-remove" onclick="disableTransport('${item.id}')">Remove</button>
+        </div>
         <div class="card-body">
           <div class="field">
             <label class="label">From</label>
@@ -767,15 +875,8 @@
                    placeholder="e.g. AF1234 · booking code ABC123"
                    onchange="upd('${item.id}','confirmation',this.value)" />
           </div>
-          <div class="field span2">
-            <label class="label">Notes</label>
-            <textarea class="inp" rows="2"
-                      placeholder="Seat, terminal, baggage, links…"
-                      onchange="upd('${item.id}','notes',this.value)">${x(item.notes)}</textarea>
-          </div>
         </div>
       </div>`;
-    return el;
   }
 
   function statusOptions(current) {
@@ -830,26 +931,29 @@
     sel.className = `badge badge-${sel.value}`;
     upd(id, 'status', sel.value);
   }
-  function addDay() {
+  function addEntry() {
     pushHistory();
-    items.push({ id: uid(), type: 'day', date: lastDate(), city: '', activity: '', time: '', notes: '', status: 'idea' });
-    render(); scheduleSave();
-    scrollToLast();
-  }
-  function addTransport() {
-    pushHistory();
-    items.push({
-      id: uid(), type: 'transport', date: lastDate(),
-      mode: 'flight', from: '', to: '',
-      departTime: '', arriveTime: '',
-      confirmation: '', notes: '', status: 'idea',
-    });
+    const entry = blank();
+    entry.date = lastDate();
+    items.push(entry);
     render(); scheduleSave();
     scrollToLast();
   }
   function removeItem(id) {
     pushHistory();
     items = items.filter(i => i.id !== id);
+    render(); scheduleSave();
+  }
+  function enableTransport(id) {
+    pushHistory();
+    items = items.map(i => i.id === id ? { ...i, hasTransport: true } : i);
+    render(); scheduleSave();
+  }
+  function disableTransport(id) {
+    pushHistory();
+    items = items.map(i => i.id === id
+      ? { ...i, hasTransport: false, from: '', to: '', departTime: '', arriveTime: '', confirmation: '' }
+      : i);
     render(); scheduleSave();
   }
 
