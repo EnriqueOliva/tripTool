@@ -9,6 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+
   <style>
     :root {
       /* Canvas */
@@ -274,6 +276,33 @@
       padding: 14px 18px;
       border-bottom: 1px solid var(--border);
     }
+
+    .drag-handle {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 24px; height: 24px;
+      color: var(--text-3);
+      cursor: grab;
+      user-select: none;
+      border-radius: 6px;
+      transition: background .15s, color .15s;
+      flex-shrink: 0;
+      font-size: 16px; line-height: 1;
+    }
+    .drag-handle:hover  { background: var(--surface-2); color: var(--text-2); }
+    .drag-handle:active { cursor: grabbing; }
+
+    /* Sortable drag states */
+    .card-ghost {
+      opacity: 0.35;
+      background: var(--surface-2) !important;
+    }
+    .card-chosen {
+      box-shadow: var(--shadow-lg) !important;
+    }
+    .card-drag {
+      opacity: 0.95;
+      cursor: grabbing;
+    }
     .card.type-activity  .card-head { background: linear-gradient(180deg, var(--activity-soft)  0%, transparent 100%); }
     .card.type-transport .card-head { background: linear-gradient(180deg, var(--transport-soft) 0%, transparent 100%); }
     .card.type-hotel     .card-head { background: linear-gradient(180deg, var(--hotel-soft)     0%, transparent 100%); }
@@ -484,6 +513,7 @@
       .type-pill { font-size: 11px; padding: 4px 10px; }
       .badge     { font-size: 11px; padding: 4px 10px; }
       .mode-sel  { font-size: 13px; }
+      .drag-handle { width: 32px; height: 32px; font-size: 18px; }
       .inp       { font-size: 16px; } /* ≥16px prevents iOS zoom */
       .label     { font-size: 12px; }
 
@@ -548,7 +578,7 @@
 </div>
 
 <main class="stage">
-  <p class="intro">A chronology of your trip, day by day. Pick your start and end above, then add an <strong style="color:var(--activity)">activity</strong>, <strong style="color:var(--transport)">transport</strong>, or <strong style="color:var(--hotel)">hotel</strong> to any day.</p>
+  <p class="intro">A chronology of your trip, day by day. Pick your start and end above, then add an <strong style="color:var(--activity)">activity</strong>, <strong style="color:var(--transport)">transport</strong>, or <strong style="color:var(--hotel)">hotel</strong> to any day. Drag the <span style="color:var(--text-2)">⋮⋮</span> handle to reorder or move cards between days.</p>
 
   <div class="days" id="days"></div>
 </main>
@@ -883,6 +913,7 @@
     }
 
     document.querySelectorAll('.day-block').forEach(el => io.observe(el));
+    initSortables();
     saveLocal();
   }
 
@@ -914,10 +945,9 @@
   function renderDayBlock(date, dayNum) {
     const el = document.createElement('section');
     el.className = 'day-block';
+    el.dataset.date = date;
 
-    const dayCards = state.cards
-      .filter(c => c.date === date)
-      .sort(sortCards);
+    const dayCards = state.cards.filter(c => c.date === date);
 
     el.innerHTML = `
       <div class="day-header">
@@ -954,6 +984,7 @@
   function renderUnscheduled(cards) {
     const el = document.createElement('section');
     el.className = 'unscheduled day-block';
+    el.dataset.date = '';
     el.innerHTML = `
       <div class="unscheduled-title">Unscheduled · outside trip range</div>
       <div class="day-cards" style="padding-left:0;"></div>`;
@@ -962,21 +993,53 @@
     return el;
   }
 
-  function sortCards(a, b) {
-    const typeOrder = { transport: 0, activity: 1, hotel: 2 };
-    const ta = a.time || a.departTime || a.checkInTime || '';
-    const tb = b.time || b.departTime || b.checkInTime || '';
-    if (ta && tb && ta !== tb) return ta.localeCompare(tb);
-    if (a.type !== b.type) return (typeOrder[a.type] ?? 9) - (typeOrder[b.type] ?? 9);
-    return 0;
+  // ── Drag & drop ──────────────────────────────────────────────
+  function initSortables() {
+    document.querySelectorAll('.day-cards').forEach(el => {
+      new Sortable(el, {
+        group: 'cards',
+        animation: 180,
+        handle: '.drag-handle',
+        ghostClass:  'card-ghost',
+        chosenClass: 'card-chosen',
+        dragClass:   'card-drag',
+        onEnd: handleDragEnd,
+      });
+    });
+  }
+
+  function handleDragEnd(evt) {
+    // No actual move
+    if (evt.from === evt.to && evt.oldIndex === evt.newIndex) return;
+
+    // Snapshot BEFORE applying the change so Undo can restore it
+    pushHistory();
+
+    // Rebuild state.cards from the current DOM order across all day-blocks
+    const newCards = [];
+    document.querySelectorAll('.day-block').forEach(block => {
+      const date = block.dataset.date || '';
+      block.querySelectorAll('.day-cards .card').forEach(cardEl => {
+        const id = cardEl.dataset.cardId;
+        const existing = state.cards.find(c => c.id === id);
+        if (existing) newCards.push({ ...existing, date });
+      });
+    });
+    state.cards = newCards;
+
+    updateMeta();
+    saveLocal();
+    scheduleSave();
   }
 
   function renderCard(c) {
     const el = document.createElement('article');
     el.className = `card type-${c.type}`;
+    el.dataset.cardId = c.id;
 
     const head = `
       <header class="card-head">
+        <span class="drag-handle" title="Drag to reorder or move to another day">⋮⋮</span>
         <span class="type-pill">${TYPES[c.type].icon} ${TYPES[c.type].label}</span>
         ${c.type === 'transport' ? `
           <select class="mode-sel" onchange="upd('${c.id}','mode',this.value); render()">
