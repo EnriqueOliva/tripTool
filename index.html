@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Our Trip</title>
+  <style>
+    :root {
+      --bg: #f8f6f2;
+      --surface: #ffffff;
+      --surface-2: #f2efea;
+      --border: #e4dfd7;
+      --text: #1c1a17;
+      --text-2: #6b6358;
+      --text-3: #a89f95;
+      --accent: #c07c3e;
+      --accent-bg: #fdf0e3;
+      --green: #3e7e52;
+      --green-bg: #e7f4ec;
+      --blue: #3661a0;
+      --blue-bg: #e7eef8;
+      --red: #a03636;
+      --red-bg: #f8e7e7;
+      --r: 10px;
+      --r-sm: 6px;
+      --shadow: 0 1px 3px rgba(0,0,0,.07), 0 2px 8px rgba(0,0,0,.05);
+      --shadow-lg: 0 4px 20px rgba(0,0,0,.09), 0 1px 4px rgba(0,0,0,.05);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* ── Header ── */
+    .header {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 62px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+
+    .header-left { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+
+    .trip-title {
+      font-size: 18px; font-weight: 700;
+      border: none; background: transparent; outline: none;
+      color: var(--text); padding: 0; max-width: 380px; width: 100%;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .trip-title:focus { color: var(--accent); }
+
+    .trip-meta { font-size: 12px; color: var(--text-3); }
+
+    .header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 7px 14px; border-radius: var(--r-sm);
+      font-size: 13px; font-weight: 500; cursor: pointer;
+      border: none; transition: background .12s, color .12s; white-space: nowrap;
+      font-family: inherit;
+    }
+    .btn-dark  { background: var(--text);    color: #fff; }
+    .btn-dark:hover  { background: #333; }
+    .btn-outline { background: #fff; color: var(--text-2); border: 1px solid var(--border); }
+    .btn-outline:hover { background: var(--surface-2); }
+    .btn-ghost { background: transparent; color: var(--text-3); padding: 6px 8px; }
+    .btn-ghost:hover { background: var(--surface-2); color: var(--text-2); }
+    .btn-ghost.danger:hover { background: var(--red-bg); color: var(--red); }
+
+    .status-dot {
+      font-size: 12px; color: var(--text-3); display: flex; align-items: center; gap: 5px;
+    }
+    .status-dot.saving { color: var(--accent); }
+    .status-dot.saved  { color: var(--green); }
+    .status-dot.err    { color: var(--red); }
+
+    /* ── Setup Banner ── */
+    .banner {
+      background: var(--accent-bg);
+      border: 1px solid #e8d0ae;
+      border-radius: var(--r);
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .banner.hidden { display: none; }
+    .banner-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+    .banner-body { flex: 1; }
+    .banner-body strong { font-size: 14px; }
+    .banner-body p { font-size: 13px; color: var(--text-2); margin-top: 3px; }
+    .banner-row { display: flex; gap: 8px; margin-top: 10px; }
+    .banner-input {
+      flex: 1; padding: 8px 12px;
+      border: 1px solid var(--border); border-radius: var(--r-sm);
+      font-size: 13px; font-family: monospace; outline: none; background: #fff;
+      min-width: 0;
+    }
+    .banner-input:focus { border-color: var(--accent); }
+
+    /* ── Main ── */
+    .main { max-width: 780px; margin: 0 auto; padding: 32px 24px; }
+
+    /* ── Cards ── */
+    .days { display: flex; flex-direction: column; gap: 10px; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: box-shadow .15s;
+    }
+    .card:hover { box-shadow: var(--shadow-lg); }
+
+    .card-head {
+      display: grid;
+      grid-template-columns: 36px 1fr auto auto;
+      gap: 10px; align-items: center;
+      padding: 12px 16px;
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .day-num {
+      font-size: 10px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .1em;
+      color: var(--text-3); text-align: center;
+    }
+
+    .date-input {
+      font-size: 13px; font-weight: 600;
+      border: none; background: transparent; outline: none;
+      color: var(--text); cursor: pointer; font-family: inherit;
+    }
+    .date-input:focus { color: var(--accent); }
+
+    .badge {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .07em;
+      padding: 3px 9px; border-radius: 20px;
+      border: none; cursor: pointer; outline: none;
+      appearance: none; -webkit-appearance: none;
+      font-family: inherit;
+    }
+    .badge-idea      { background: var(--surface-2); color: var(--text-3); }
+    .badge-tentative { background: var(--blue-bg);   color: var(--blue); }
+    .badge-booked    { background: var(--green-bg);  color: var(--green); }
+
+    .card-body {
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 20px;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 4px; }
+    .field.span2 { grid-column: 1 / -1; }
+
+    .label {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .1em;
+      color: var(--text-3);
+    }
+
+    .inp {
+      font-size: 14px; color: var(--text);
+      border: none; border-bottom: 1.5px solid transparent;
+      background: transparent; outline: none; padding: 2px 0;
+      width: 100%; transition: border-color .15s;
+      font-family: inherit;
+    }
+    .inp:focus { border-bottom-color: var(--accent); }
+    .inp::placeholder { color: var(--text-3); }
+
+    textarea.inp { resize: none; min-height: 40px; line-height: 1.5; }
+
+    /* ── Add Day ── */
+    .add-btn {
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+      width: 100%; padding: 14px;
+      border: 2px dashed var(--border);
+      border-radius: var(--r);
+      background: transparent; cursor: pointer;
+      color: var(--text-3); font-size: 14px; font-weight: 500;
+      transition: all .15s; margin-top: 6px; font-family: inherit;
+    }
+    .add-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--text); color: #fff;
+      padding: 11px 18px; border-radius: var(--r-sm);
+      font-size: 13px; font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(60px); opacity: 0;
+      transition: transform .28s cubic-bezier(.34,1.56,.64,1), opacity .2s;
+      z-index: 999; pointer-events: none;
+    }
+    .toast.on { transform: translateY(0); opacity: 1; }
+    .toast.ok  { background: var(--green); }
+    .toast.bad { background: var(--red); }
+
+    /* ── Empty ── */
+    .empty { text-align: center; padding: 56px 24px; color: var(--text-3); }
+    .empty-icon { font-size: 36px; margin-bottom: 10px; }
+    .empty p { font-size: 14px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 560px) {
+      .header { padding: 0 16px; }
+      .main { padding: 20px 14px; }
+      .card-body { grid-template-columns: 1fr; }
+      .field.span2 { grid-column: 1; }
+      .card-head { grid-template-columns: 28px 1fr auto auto; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-left">
+    <input class="trip-title" id="tripTitle" type="text" value="Our Trip ✈️" spellcheck="false" />
+    <div class="trip-meta" id="tripMeta"></div>
+  </div>
+  <div class="header-right">
+    <span class="status-dot" id="statusDot"></span>
+    <button class="btn btn-outline" onclick="loadFromSheets()">↓ Load</button>
+    <button class="btn btn-dark"    onclick="saveToSheets()">↑ Save online</button>
+  </div>
+</header>
+
+<main class="main">
+
+  <div class="banner" id="banner">
+    <span class="banner-icon">🔗</span>
+    <div class="banner-body">
+      <strong>Connect your Google Sheet</strong>
+      <p>Paste your Apps Script web app URL to enable shared saving and loading.</p>
+      <div class="banner-row">
+        <input class="banner-input" id="urlInput" type="text"
+               placeholder="https://script.google.com/macros/s/…/exec" />
+        <button class="btn btn-dark" onclick="connectUrl()">Connect</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="days" id="days"></div>
+
+  <button class="add-btn" onclick="addDay()">+ Add day</button>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const LS      = 'tp_items_v1';
+  const LS_URL  = 'tp_script_url';
+  const LS_TITLE = 'tp_title';
+
+  let items = [];
+  let scriptUrl = localStorage.getItem(LS_URL) || '';
+
+  // ── Bootstrap ────────────────────────────────────────────────
+  function init() {
+    const t = localStorage.getItem(LS_TITLE);
+    if (t) document.getElementById('tripTitle').value = t;
+
+    document.getElementById('tripTitle').addEventListener('input', e => {
+      localStorage.setItem(LS_TITLE, e.target.value);
+      updateMeta();
+    });
+
+    if (scriptUrl) {
+      document.getElementById('urlInput').value = scriptUrl;
+      document.getElementById('banner').classList.add('hidden');
+      loadFromSheets();
+    } else {
+      loadLocal();
+    }
+  }
+
+  function loadLocal() {
+    try {
+      const s = localStorage.getItem(LS);
+      items = s ? JSON.parse(s) : seed();
+    } catch { items = seed(); }
+    render();
+  }
+
+  function seed() {
+    return [{ id: uid(), date: '', city: '', activity: '', time: '', notes: '', status: 'idea' }];
+  }
+
+  function uid() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+  }
+
+  // ── Render ───────────────────────────────────────────────────
+  function render() {
+    const el = document.getElementById('days');
+    el.innerHTML = '';
+
+    if (!items.length) {
+      el.innerHTML = '<div class="empty"><div class="empty-icon">🗺️</div><p>No days yet.</p></div>';
+      updateMeta(); return;
+    }
+
+    items.forEach((item, i) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="card-head">
+          <span class="day-num">${i + 1}</span>
+          <input class="date-input" type="date" value="${item.date}"
+                 onchange="upd('${item.id}','date',this.value)" />
+          <select class="badge badge-${item.status}"
+                  onchange="updStatus('${item.id}',this)">
+            <option value="idea"      ${item.status==='idea'      ?'selected':''}>Idea</option>
+            <option value="tentative" ${item.status==='tentative' ?'selected':''}>Tentative</option>
+            <option value="booked"    ${item.status==='booked'    ?'selected':''}>Booked ✓</option>
+          </select>
+          <button class="btn btn-ghost danger" title="Remove"
+                  onclick="remove('${item.id}')">✕</button>
+        </div>
+        <div class="card-body">
+          <div class="field">
+            <label class="label">City / Destination</label>
+            <input class="inp" type="text" value="${x(item.city)}"
+                   placeholder="e.g. Paris"
+                   onchange="upd('${item.id}','city',this.value)" />
+          </div>
+          <div class="field">
+            <label class="label">Time</label>
+            <input class="inp" type="text" value="${x(item.time)}"
+                   placeholder="e.g. Morning"
+                   onchange="upd('${item.id}','time',this.value)" />
+          </div>
+          <div class="field span2">
+            <label class="label">Activity</label>
+            <input class="inp" type="text" value="${x(item.activity)}"
+                   placeholder="What are you doing?"
+                   onchange="upd('${item.id}','activity',this.value)" />
+          </div>
+          <div class="field span2">
+            <label class="label">Notes</label>
+            <textarea class="inp" rows="2"
+                      placeholder="Links, reservations, things to remember…"
+                      onchange="upd('${item.id}','notes',this.value)">${x(item.notes)}</textarea>
+          </div>
+        </div>`;
+      el.appendChild(card);
+    });
+
+    saveLocal();
+    updateMeta();
+  }
+
+  function x(s) {
+    if (!s) return '';
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/"/g,'&quot;')
+      .replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function updateMeta() {
+    const dates = items.map(i => i.date).filter(Boolean).sort();
+    const n = items.length;
+    const part = n ? `${n} day${n !== 1 ? 's' : ''}` : '';
+    if (dates.length >= 2) {
+      document.getElementById('tripMeta').textContent =
+        `${fmt(dates[0])} → ${fmt(dates[dates.length-1])}  ·  ${part}`;
+    } else if (dates.length === 1) {
+      document.getElementById('tripMeta').textContent = `${fmt(dates[0])}  ·  ${part}`;
+    } else {
+      document.getElementById('tripMeta').textContent = part;
+    }
+  }
+
+  function fmt(s) {
+    if (!s) return '';
+    return new Date(s + 'T12:00:00').toLocaleDateString('en-US',
+      { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  // ── Data ops ─────────────────────────────────────────────────
+  function upd(id, field, val) {
+    items = items.map(i => i.id === id ? { ...i, [field]: val } : i);
+    saveLocal(); updateMeta();
+  }
+
+  function updStatus(id, sel) {
+    sel.className = `badge badge-${sel.value}`;
+    upd(id, 'status', sel.value);
+  }
+
+  function addDay() {
+    items.push({ id: uid(), date: '', city: '', activity: '', time: '', notes: '', status: 'idea' });
+    render();
+    setTimeout(() => {
+      const cards = document.querySelectorAll('.card');
+      if (cards.length) cards[cards.length-1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 60);
+  }
+
+  function remove(id) {
+    items = items.filter(i => i.id !== id);
+    render();
+  }
+
+  function saveLocal() {
+    localStorage.setItem(LS, JSON.stringify(items));
+  }
+
+  // ── Script URL ───────────────────────────────────────────────
+  function connectUrl() {
+    const url = document.getElementById('urlInput').value.trim();
+    if (!url.startsWith('https://script.google.com')) {
+      toast("That doesn't look like a valid Apps Script URL", 'bad'); return;
+    }
+    scriptUrl = url;
+    localStorage.setItem(LS_URL, url);
+    document.getElementById('banner').classList.add('hidden');
+    toast('Connected! Loading from sheet…', 'ok');
+    loadFromSheets();
+  }
+
+  // ── Google Sheets ─────────────────────────────────────────────
+  async function loadFromSheets() {
+    if (!scriptUrl) { loadLocal(); return; }
+    dot('saving', '↓ loading…');
+    try {
+      const res  = await fetch(scriptUrl);
+      const data = await res.json();
+      if (Array.isArray(data) && data.length) {
+        items = data.map(r => ({
+          id:       r.id       || uid(),
+          date:     r.date     || '',
+          city:     r.city     || '',
+          activity: r.activity || '',
+          time:     r.time     || '',
+          notes:    r.notes    || '',
+          status:   r.status   || 'idea',
+        }));
+        render();
+        toast('Loaded from Google Sheets', 'ok');
+      } else {
+        loadLocal();
+      }
+    } catch (e) {
+      console.error(e);
+      dot('err', 'load failed');
+      loadLocal();
+      toast('Could not reach Google Sheets — showing local data', 'bad');
+    }
+    setTimeout(() => dot('',''), 3000);
+  }
+
+  async function saveToSheets() {
+    if (!scriptUrl) {
+      toast('Connect a Google Sheet first', 'bad');
+      document.getElementById('banner').classList.remove('hidden');
+      return;
+    }
+    dot('saving', '↑ saving…');
+    try {
+      const res  = await fetch(scriptUrl, {
+        method:  'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body:    JSON.stringify(items),
+      });
+      const data = await res.json();
+      if (data.success) {
+        dot('saved', '✓ saved');
+        toast('Saved to Google Sheets', 'ok');
+        setTimeout(() => dot('',''), 3000);
+      }
+    } catch (e) {
+      console.error(e);
+      dot('err', 'save failed');
+      toast('Save failed — check your connection', 'bad');
+    }
+  }
+
+  function dot(cls, text) {
+    const el = document.getElementById('statusDot');
+    el.textContent = text;
+    el.className = 'status-dot' + (cls ? ' ' + cls : '');
+  }
+
+  // ── Toast ─────────────────────────────────────────────────────
+  let toastTimer;
+  function toast(msg, cls = '') {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'toast on' + (cls ? ' ' + cls : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.className = 'toast'; }, 3500);
+  }
+
+  init();
+</script>
+</body>
+</html>
