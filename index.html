@@ -520,65 +520,27 @@
     /* ───────── Unsaved warning strip ───────── */
     .unsaved-strip {
       display: none;
-      align-items: center; justify-content: center; gap: 14px;
-      background: linear-gradient(90deg,
-        rgba(251,191,36,.28) 0%,
-        rgba(251,146,60,.28) 50%,
-        rgba(251,191,36,.28) 100%);
-      background-size: 200% 100%;
-      border-top: 2px solid var(--tent-fg);
-      border-bottom: 1px solid rgba(251,191,36,.4);
-      padding: 14px 24px;
-      color: #fbbf24;
-      font-size: 16px; font-weight: 700;
-      letter-spacing: .02em;
-      text-transform: uppercase;
-      animation: strip-shimmer 3s linear infinite;
-    }
-    .unsaved-strip.show { display: flex; animation: strip-shimmer 3s linear infinite, strip-intro .4s var(--ease); }
-    .unsaved-strip.err  {
-      background: linear-gradient(90deg, rgba(251,113,133,.28), rgba(239,68,68,.28), rgba(251,113,133,.28));
-      border-top-color: var(--danger); border-bottom-color: rgba(251,113,133,.4);
+      align-items: center; justify-content: center; gap: 10px;
+      background: rgba(251,113,133,.10);
+      border-top: 1px solid rgba(251,113,133,.35);
+      padding: 8px 20px;
       color: var(--danger);
+      font-size: 13px; font-weight: 600;
+      letter-spacing: .02em;
     }
-    @keyframes strip-shimmer {
-      0%   { background-position:   0% 50%; }
-      100% { background-position: 200% 50%; }
-    }
-    @keyframes strip-intro {
-      from { transform: translateY(-100%); opacity: 0; }
-      to   { transform: translateY(0);     opacity: 1; }
-    }
+    .unsaved-strip.show { display: flex; }
+    .unsaved-strip.err  { background: rgba(251,113,133,.14); }
     .unsaved-icon {
-      width: 22px; height: 22px;
-      display: inline-flex; align-items: center; justify-content: center;
-      font-size: 18px;
-      animation: icon-wobble 2s ease-in-out infinite;
-    }
-    @keyframes icon-wobble {
-      0%, 100% { transform: rotate(0);    }
-      25%      { transform: rotate(-10deg); }
-      75%      { transform: rotate(10deg);  }
+      font-size: 14px; line-height: 1;
     }
     .unsaved-dot {
-      width: 12px; height: 12px; border-radius: 50%;
+      width: 8px; height: 8px; border-radius: 50%;
       background: currentColor;
-      box-shadow: 0 0 0 0 currentColor;
-      animation: dirty-pulse 1.4s var(--ease) infinite;
+      animation: dirty-pulse 1.6s var(--ease) infinite;
     }
     @keyframes dirty-pulse {
-      0%   { box-shadow: 0 0 0 0   rgba(251,191,36,.7); }
-      60%  { box-shadow: 0 0 0 14px rgba(251,191,36,0); }
-      100% { box-shadow: 0 0 0 0   rgba(251,191,36,0); }
-    }
-
-    /* Save button urgency when dirty */
-    body.is-dirty .btn-dark {
-      animation: save-btn-pulse 1.6s var(--ease) infinite;
-    }
-    @keyframes save-btn-pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(251,191,36,.65), 0 0 0 0 rgba(251,191,36,.5); }
-      50%      { box-shadow: 0 0 0 8px rgba(251,191,36,0), 0 0 30px rgba(251,191,36,.4); }
+      0%, 100% { opacity: 1;   box-shadow: 0 0 0 0 rgba(251,113,133,.45); }
+      60%      { opacity: .55; box-shadow: 0 0 0 7px rgba(251,113,133,0); }
     }
 
     /* ───────── Save confirmation (big center checkmark) ───────── */
