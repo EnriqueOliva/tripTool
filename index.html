@@ -238,9 +238,12 @@
   const BIN_KEY  = '$2a$10$I4VrBBHY70cCt0j8YaGuNOfCYbsoQx7yxf/tcCtn8dTdR7yNBRVxq';
   const BIN_URL  = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
-  let items   = [];
-  let history = [];
+  let items     = [];
+  let history   = [];
   let saveTimer = null;
+  let dirty     = false;
+  let saving    = false;
+  const SAVE_DEBOUNCE_MS = 10000;
 
   // ── Bootstrap ────────────────────────────────────────────────
   function init() {
@@ -257,6 +260,10 @@
     document.addEventListener('keydown', e => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
     });
+
+    window.addEventListener('beforeunload', e => {
+      if (dirty || saving) { e.preventDefault(); e.returnValue = ''; }
+    });
   }
 
   function loadLocal() {
@@ -268,24 +275,32 @@
   }
 
   async function load() {
-    dot('saving', '↓ loading…');
+    const el = document.getElementById('statusDot');
+    el.className = 'status-dot saving';
+    el.textContent = '↓ loading…';
     try {
       const res  = await fetch(`${BIN_URL}/latest`, { headers: { 'X-Master-Key': BIN_KEY } });
-      const data = await res.json();
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data  = await res.json();
       const saved = data?.record?.items;
-      if (Array.isArray(saved) && saved.length) {
-        items = saved;
+      if (Array.isArray(saved)) {
+        items = saved.length ? saved : seed();
+        history = [];
+        document.getElementById('undoBtn').disabled = true;
+        dirty = false;
         render();
         toast('Loaded', 'ok');
+        setState('idle');
       } else {
         loadLocal();
+        setState('idle');
       }
     } catch (e) {
       console.error(e);
       loadLocal();
-      toast('Could not reach JSONBin — showing local data', 'bad');
+      setState('error');
+      toast('Could not reach server — showing local data', 'bad');
     }
-    setTimeout(() => dot('', ''), 2000);
   }
 
   function seed() {
@@ -432,40 +447,77 @@
   }
 
   function scheduleSave() {
-    dot('saving', '· unsaved');
+    dirty = true;
+    setState('dirty');
     clearTimeout(saveTimer);
-    saveTimer = setTimeout(saveToSheets, 2000);
+    saveTimer = setTimeout(doSave, SAVE_DEBOUNCE_MS);
   }
 
   // ── JSONBin ───────────────────────────────────────────────────
-  async function saveToSheets() {
-    dot('saving', '↑ saving…');
+  async function doSave() {
+    clearTimeout(saveTimer);
+    if (saving) return;                 // one in flight already
+    if (!dirty) { setState('saved'); return; }
+
+    saving = true;
+    dirty  = false;                     // edits during save will flip this back
+    const snapshot = JSON.stringify({ items });
+    setState('saving');
+
     try {
-      const res  = await fetch(BIN_URL, {
+      const res = await fetch(BIN_URL, {
         method:  'PUT',
         headers: { 'Content-Type': 'application/json', 'X-Master-Key': BIN_KEY },
-        body:    JSON.stringify({ items }),
+        body:    snapshot,
       });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
-      if (data?.record) {
-        dot('saved', '✓ saved');
-        toast('Saved online', 'ok');
-        setTimeout(() => dot('', ''), 3000);
+      if (!data?.record) throw new Error('Unexpected response');
+      saving = false;
+
+      if (dirty) {                      // new edits came in during save
+        scheduleSave();
+      } else {
+        setState('saved');
+        setTimeout(() => { if (!dirty && !saving) setState('idle'); }, 3000);
       }
     } catch (e) {
-      console.error(e);
-      dot('err', 'save failed');
-      toast('Save failed', 'bad');
+      console.error('save failed:', e);
+      saving = false;
+      dirty  = true;
+      setState('error');
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(doSave, SAVE_DEBOUNCE_MS); // retry
+      toast('Save failed — will retry', 'bad');
     }
   }
 
-  async function loadFromSheets() { load(); }
-
-  function dot(cls, text) {
-    const el = document.getElementById('statusDot');
-    el.textContent = text;
-    el.className = 'status-dot' + (cls ? ' ' + cls : '');
+  // Manual "Save now" — cancels pending debounce and saves immediately
+  function saveToSheets() {
+    dirty = true;
+    clearTimeout(saveTimer);
+    doSave();
   }
+
+  // Manual "Load"
+  async function loadFromSheets() {
+    if (dirty || saving) {
+      if (!confirm('You have unsaved changes. Load will overwrite them. Continue?')) return;
+    }
+    await load();
+  }
+
+  function setState(state) {
+    const el = document.getElementById('statusDot');
+    switch (state) {
+      case 'idle':   el.className = 'status-dot';        el.textContent = '';            break;
+      case 'dirty':  el.className = 'status-dot saving'; el.textContent = '· unsaved';   break;
+      case 'saving': el.className = 'status-dot saving'; el.textContent = '↑ saving…';   break;
+      case 'saved':  el.className = 'status-dot saved';  el.textContent = '✓ saved';     break;
+      case 'error':  el.className = 'status-dot err';    el.textContent = '⚠ retrying'; break;
+    }
+  }
+
 
   // ── Toast ─────────────────────────────────────────────────────
   let toastTimer;
