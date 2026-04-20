@@ -693,7 +693,7 @@
   function blankCard(type, date = '') {
     const base = { id: uid(), type, date, status: 'idea', notes: '' };
     if (type === 'activity')  return { ...base, location: '', time: '', activity: '' };
-    if (type === 'transport') return { ...base, mode: 'flight', from: '', to: '', departTime: '', arriveTime: '', confirmation: '' };
+    if (type === 'transport') return { ...base, mode: 'flight', from: '', to: '', departTime: '', arriveTime: '', confirmation: '', confirmation2: '' };
     if (type === 'hotel')     return { ...base, name: '', address: '', checkInDate: '', checkInTime: '', checkOutDate: '', checkOutTime: '', confirmation: '' };
     return base;
   }
@@ -762,7 +762,8 @@
       mode: c.mode || 'flight',
       from: c.from || '', to: c.to || '',
       departTime: c.departTime || '', arriveTime: c.arriveTime || '',
-      confirmation: c.confirmation || '',
+      confirmation:  c.confirmation  || '',
+      confirmation2: c.confirmation2 || '',
     };
     if (base.type === 'hotel') return {
       ...base,
@@ -1168,11 +1169,17 @@
           <input class="inp" type="time" value="${x(c.arriveTime)}"
                  onchange="upd('${c.id}','arriveTime',this.value)" />
         </div>
-        <div class="field span2">
+        <div class="field">
           <label class="label">Reference / confirmation</label>
           <input class="inp" type="text" value="${x(c.confirmation)}"
-                 placeholder="e.g. AF1234 · booking code ABC123"
+                 placeholder="Your booking code"
                  onchange="upd('${c.id}','confirmation',this.value)" />
+        </div>
+        <div class="field">
+          <label class="label">Reference / confirmation (partner)</label>
+          <input class="inp" type="text" value="${x(c.confirmation2)}"
+                 placeholder="Partner's booking code"
+                 onchange="upd('${c.id}','confirmation2',this.value)" />
         </div>
         <div class="field span2">
           <label class="label">Notes</label>
