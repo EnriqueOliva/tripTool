@@ -215,8 +215,9 @@
   </div>
   <div class="header-right">
     <span class="status-dot" id="statusDot"></span>
+    <button class="btn btn-outline" id="undoBtn" onclick="undo()" disabled>↩ Undo</button>
     <button class="btn btn-outline" onclick="loadFromSheets()">↓ Load</button>
-    <button class="btn btn-dark"    onclick="saveToSheets()">↑ Save online</button>
+    <button class="btn btn-dark"    onclick="saveToSheets()">↑ Save now</button>
   </div>
 </header>
 
@@ -237,7 +238,9 @@
   const BIN_KEY  = '$2a$10$I4VrBBHY70cCt0j8YaGuNOfCYbsoQx7yxf/tcCtn8dTdR7yNBRVxq';
   const BIN_URL  = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
-  let items = [];
+  let items   = [];
+  let history = [];
+  let saveTimer = null;
 
   // ── Bootstrap ────────────────────────────────────────────────
   function init() {
@@ -250,6 +253,10 @@
     });
 
     load();
+
+    document.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
+    });
   }
 
   function loadLocal() {
@@ -376,10 +383,27 @@
       { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
+  // ── History / Undo ────────────────────────────────────────────
+  function pushHistory() {
+    history.push(JSON.stringify(items));
+    if (history.length > 50) history.shift();
+    document.getElementById('undoBtn').disabled = false;
+  }
+
+  function undo() {
+    if (!history.length) return;
+    items = JSON.parse(history.pop());
+    document.getElementById('undoBtn').disabled = history.length === 0;
+    render();
+    scheduleSave();
+    toast('Undone', '');
+  }
+
   // ── Data ops ─────────────────────────────────────────────────
   function upd(id, field, val) {
+    pushHistory();
     items = items.map(i => i.id === id ? { ...i, [field]: val } : i);
-    saveLocal(); updateMeta();
+    saveLocal(); updateMeta(); scheduleSave();
   }
 
   function updStatus(id, sel) {
@@ -388,8 +412,9 @@
   }
 
   function addDay() {
+    pushHistory();
     items.push({ id: uid(), date: '', city: '', activity: '', time: '', notes: '', status: 'idea' });
-    render();
+    render(); scheduleSave();
     setTimeout(() => {
       const cards = document.querySelectorAll('.card');
       if (cards.length) cards[cards.length-1].scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -397,12 +422,19 @@
   }
 
   function remove(id) {
+    pushHistory();
     items = items.filter(i => i.id !== id);
-    render();
+    render(); scheduleSave();
   }
 
   function saveLocal() {
     localStorage.setItem(LS, JSON.stringify(items));
+  }
+
+  function scheduleSave() {
+    dot('saving', '· unsaved');
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveToSheets, 2000);
   }
 
   // ── JSONBin ───────────────────────────────────────────────────
