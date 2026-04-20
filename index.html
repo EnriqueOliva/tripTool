@@ -177,13 +177,29 @@
     /* ───────── Main stage ───────── */
     .stage { max-width: 960px; margin: 0 auto; padding: 28px 24px 140px; }
 
-    .intro {
+    .trip-description {
+      display: block;
+      width: 100%;
+      max-width: 680px;
       margin-bottom: 40px;
-      color: var(--text-2);
+      border: none;
+      background: transparent;
+      outline: none;
+      resize: none;
+      overflow: hidden;
+      font-family: inherit;
+      font-weight: 400;
       font-size: 19px;
       line-height: 1.55;
-      max-width: 640px;
+      color: var(--text-2);
+      padding: 8px 10px;
+      margin-left: -10px;
+      border-radius: 10px;
+      transition: background .15s, color .15s;
     }
+    .trip-description:hover { background: rgba(255,255,255,.02); }
+    .trip-description:focus { color: var(--text); background: rgba(255,255,255,.03); }
+    .trip-description::placeholder { color: var(--text-3); font-style: italic; }
 
     /* ───────── Day blocks ───────── */
     .days { display: flex; flex-direction: column; gap: 42px; position: relative; }
@@ -379,12 +395,23 @@
     textarea.inp { resize: none; min-height: 44px; line-height: 1.55; font-family: inherit; }
 
     /* ───────── Big add buttons ───────── */
+    .day-adds-label {
+      margin-left: 56px;
+      margin-top: 18px; margin-bottom: 8px;
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .16em;
+      color: var(--text-3);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .day-adds-label::after {
+      content: ""; flex: 1; height: 1px;
+      background: var(--border);
+    }
     .day-adds {
       margin-left: 56px;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
-      margin-top: 12px;
     }
     .day-add {
       display: flex; flex-direction: column; align-items: center; gap: 8px;
@@ -494,6 +521,7 @@
       .day-count { font-size: 12px; padding: 4px 10px; }
 
       .day-cards { padding: 12px 0 12px 28px; gap: 10px; }
+      .day-adds-label { margin-left: 28px; font-size: 11px; }
       .day-adds {
         margin-left: 28px;
         grid-template-columns: 1fr;
@@ -530,9 +558,8 @@
       .days::before { left: 14px; }
       .day-header { padding-left: 50px; }
       .day-dot { left: 4px; }
-      .day-cards, .day-adds { padding-left: 22px; margin-left: 22px; }
       .day-cards { padding-left: 22px; }
-      .day-adds  { margin-left: 22px; }
+      .day-adds, .day-adds-label { margin-left: 22px; }
       .brand-title { font-size: 24px; }
     }
   </style>
@@ -578,7 +605,8 @@
 </div>
 
 <main class="stage">
-  <p class="intro">A chronology of your trip, day by day. Pick your start and end above, then add an <strong style="color:var(--activity)">activity</strong>, <strong style="color:var(--transport)">transport</strong>, or <strong style="color:var(--hotel)">hotel</strong> to any day. Drag the <span style="color:var(--text-2)">⋮⋮</span> handle to reorder or move cards between days.</p>
+  <textarea class="trip-description" id="tripDescription" rows="1"
+            placeholder="Write an intro for this trip — who, where, why, anything you want to remember…"></textarea>
 
   <div class="days" id="days"></div>
 </main>
@@ -614,6 +642,7 @@
   // ── State ────────────────────────────────────────────────────
   let state = {
     title: 'Our Trip',
+    description: '',
     startDate: '',
     endDate: '',
     cards: [],
@@ -630,6 +659,13 @@
       state.title = e.target.value;
       scheduleSave();
       updateMeta();
+    });
+
+    const desc = document.getElementById('tripDescription');
+    desc.addEventListener('input', e => {
+      state.description = e.target.value;
+      autoResize(desc);
+      scheduleSave();
     });
 
     document.addEventListener('keydown', e => {
@@ -649,6 +685,11 @@
 
   function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 5); }
 
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+  }
+
   function blankCard(type, date = '') {
     const base = { id: uid(), type, date, status: 'idea', notes: '' };
     if (type === 'activity')  return { ...base, location: '', time: '', activity: '' };
@@ -662,10 +703,11 @@
     // Already new format
     if (data && Array.isArray(data.cards)) {
       return {
-        title:     data.title     || 'Our Trip',
-        startDate: data.startDate || '',
-        endDate:   data.endDate   || '',
-        cards:     data.cards.map(normalizeCard),
+        title:       data.title       || 'Our Trip',
+        description: data.description || '',
+        startDate:   data.startDate   || '',
+        endDate:     data.endDate     || '',
+        cards:       data.cards.map(normalizeCard),
       };
     }
     // Old format: { items: [{...}] } or just [{...}]
@@ -698,9 +740,10 @@
     });
     const dates = cards.map(c => c.date).filter(Boolean).sort();
     return {
-      title:     data?.title || 'Our Trip',
-      startDate: dates[0] || '',
-      endDate:   dates[dates.length - 1] || '',
+      title:       data?.title       || 'Our Trip',
+      description: data?.description || '',
+      startDate:   dates[0] || '',
+      endDate:     dates[dates.length - 1] || '',
       cards,
     };
   }
@@ -851,7 +894,7 @@
     if (!s) return '';
     const d = new Date(s + 'T12:00:00');
     const day   = d.getDate();
-    const month = d.toLocaleDateString('en-US', { month: 'long' }).toLowerCase();
+    const month = d.toLocaleDateString('en-US', { month: 'long' });
     return `${day}/${month}/${d.getFullYear()}`;
   }
   function fmtWeekday(s) {
@@ -891,6 +934,9 @@
   // ── Render ───────────────────────────────────────────────────
   function render() {
     document.getElementById('tripTitle').value = state.title;
+    const desc = document.getElementById('tripDescription');
+    desc.value = state.description || '';
+    autoResize(desc);
     renderRangePickers();
     updateMeta();
 
@@ -967,6 +1013,7 @@
 
       <div class="day-cards"></div>
 
+      <div class="day-adds-label">Add</div>
       <div class="day-adds">
         <button class="day-add activity"  onclick="addCard('activity','${date}')">
           <span class="add-ico">☀</span><span>Activity</span>
