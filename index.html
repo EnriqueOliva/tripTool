@@ -4,248 +4,402 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Our Trip</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
   <style>
     :root {
-      --bg: #f8f6f2;
+      /* Canvas */
+      --bg: #faf7f2;
+      --bg-grad: radial-gradient(1200px 600px at 15% -10%, #fdece0 0%, transparent 60%),
+                 radial-gradient(800px 500px at 110% 20%, #e7f5f4 0%, transparent 55%),
+                 #faf7f2;
       --surface: #ffffff;
-      --surface-2: #f2efea;
-      --border: #e4dfd7;
-      --text: #1c1a17;
-      --text-2: #6b6358;
-      --text-3: #a89f95;
-      --accent: #c07c3e;
-      --accent-bg: #fdf0e3;
-      --green: #3e7e52;
-      --green-bg: #e7f4ec;
-      --blue: #3661a0;
-      --blue-bg: #e7eef8;
-      --red: #a03636;
-      --red-bg: #f8e7e7;
-      --r: 10px;
-      --r-sm: 6px;
-      --shadow: 0 1px 3px rgba(0,0,0,.07), 0 2px 8px rgba(0,0,0,.05);
-      --shadow-lg: 0 4px 20px rgba(0,0,0,.09), 0 1px 4px rgba(0,0,0,.05);
+      --surface-2: #f5f1ea;
+      --border: #e9e3d7;
+      --border-2: #dfd8c8;
+
+      /* Text */
+      --text:   #18181b;
+      --text-2: #52525b;
+      --text-3: #9c968b;
+
+      /* Brand accents */
+      --day:           #ea6d2a;
+      --day-soft:      #fdece0;
+      --day-ring:      rgba(234,109,42,.22);
+      --transport:     #0e7c8a;
+      --transport-soft:#d9f0f2;
+      --transport-ring:rgba(14,124,138,.20);
+
+      /* Status */
+      --idea-bg:#f2eee7; --idea-fg:#6b6358;
+      --tent-bg:#fff0c2; --tent-fg:#946507;
+      --book-bg:#d5f0dd; --book-fg:#1f6f42;
+
+      /* Radii & depth */
+      --r-lg: 18px;
+      --r-md: 12px;
+      --r-sm: 8px;
+      --shadow-sm: 0 1px 2px rgba(24,24,27,.04), 0 2px 6px rgba(24,24,27,.04);
+      --shadow-md: 0 4px 10px rgba(24,24,27,.05), 0 10px 30px rgba(24,24,27,.06);
+      --shadow-lg: 0 10px 20px rgba(24,24,27,.06), 0 24px 60px rgba(24,24,27,.09);
+
+      /* Motion */
+      --ease: cubic-bezier(.2,.7,.2,1);
     }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    * , *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: 100%; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      background: var(--bg);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-grad);
       color: var(--text);
-      min-height: 100vh;
-      line-height: 1.5;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    /* ── Header ── */
-    .header {
+    ::selection { background: var(--day); color: #fff; }
+
+    /* ───────── Header ───────── */
+    .topbar {
       position: sticky; top: 0; z-index: 50;
-      background: rgba(255,255,255,.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 32px;
-      height: 62px;
+      background: rgba(250,247,242,.72);
+      backdrop-filter: saturate(140%) blur(14px);
+      -webkit-backdrop-filter: saturate(140%) blur(14px);
+      border-bottom: 1px solid rgba(233,227,215,.8);
+    }
+    .topbar-inner {
+      max-width: 920px; margin: 0 auto;
+      padding: 14px 24px;
       display: flex; align-items: center; justify-content: space-between; gap: 16px;
     }
-
-    .header-left { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-
-    .trip-title {
-      font-size: 18px; font-weight: 700;
-      border: none; background: transparent; outline: none;
-      color: var(--text); padding: 0; max-width: 380px; width: 100%;
+    .brand { display: flex; flex-direction: column; min-width: 0; }
+    .brand-title {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 26px; font-weight: 400; letter-spacing: -0.01em;
+      color: var(--text); border: none; background: transparent; outline: none;
+      padding: 0; width: 100%; max-width: 420px;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .trip-title:focus { color: var(--accent); }
+    .brand-title:focus { color: var(--day); }
+    .brand-meta { font-size: 12px; color: var(--text-3); letter-spacing: .01em; margin-top: 2px; }
 
-    .trip-meta { font-size: 12px; color: var(--text-3); }
+    .toolbar { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
-    .header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-
-    /* ── Buttons ── */
     .btn {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 7px 14px; border-radius: var(--r-sm);
-      font-size: 13px; font-weight: 500; cursor: pointer;
-      border: none; transition: background .12s, color .12s; white-space: nowrap;
-      font-family: inherit;
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: 999px;
+      font: 500 13px/1 'Inter', sans-serif;
+      cursor: pointer; border: 1px solid transparent;
+      transition: transform .15s var(--ease), background .15s, color .15s, border-color .15s, box-shadow .15s;
+      white-space: nowrap;
     }
-    .btn-dark  { background: var(--text);    color: #fff; }
-    .btn-dark:hover  { background: #333; }
-    .btn-outline { background: #fff; color: var(--text-2); border: 1px solid var(--border); }
-    .btn-outline:hover { background: var(--surface-2); }
-    .btn-ghost { background: transparent; color: var(--text-3); padding: 6px 8px; }
-    .btn-ghost:hover { background: var(--surface-2); color: var(--text-2); }
-    .btn-ghost.danger:hover { background: var(--red-bg); color: var(--red); }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn[disabled] { opacity: .38; cursor: not-allowed; transform: none; }
+    .btn-dark { background: var(--text); color: #fff; }
+    .btn-dark:hover { background: #27272a; box-shadow: var(--shadow-md); }
+    .btn-ghost { background: transparent; color: var(--text-2); border-color: var(--border); }
+    .btn-ghost:hover { background: var(--surface); color: var(--text); }
+    .btn-tiny { padding: 5px 8px; font-size: 12px; border-radius: 8px; background: transparent; color: var(--text-3); border-color: transparent; }
+    .btn-tiny:hover { background: var(--surface-2); color: var(--text); transform: none; }
+    .btn-tiny.danger:hover { background: #fde2e2; color: #a01e1e; }
 
-    .status-dot {
-      font-size: 12px; color: var(--text-3); display: flex; align-items: center; gap: 5px;
+    .status {
+      font-size: 12px; color: var(--text-3);
+      display: inline-flex; align-items: center; gap: 6px;
+      min-width: 78px; padding: 0 4px;
+      transition: color .15s;
     }
-    .status-dot.saving { color: var(--accent); }
-    .status-dot.saved  { color: var(--green); }
-    .status-dot.err    { color: var(--red); }
+    .status.saving { color: var(--day); }
+    .status.saved  { color: #1f7f52; }
+    .status.err    { color: #b0293e; }
 
+    /* ───────── Timeline ───────── */
+    .stage {
+      max-width: 880px; margin: 0 auto;
+      padding: 56px 24px 120px;
+      position: relative;
+    }
 
-    /* ── Main ── */
-    .main { max-width: 780px; margin: 0 auto; padding: 32px 24px; }
+    .intro {
+      margin-bottom: 40px;
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-style: italic;
+      color: var(--text-3);
+      font-size: 18px;
+      padding-left: 76px;
+    }
 
-    /* ── Cards ── */
-    .days { display: flex; flex-direction: column; gap: 10px; }
+    .tl {
+      position: relative;
+    }
 
+    /* The vertical spine */
+    .tl::before {
+      content: "";
+      position: absolute;
+      left: 36px; top: -8px; bottom: -8px;
+      width: 2px;
+      background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        var(--border-2) 4%,
+        var(--border-2) 96%,
+        transparent 100%
+      );
+      border-radius: 2px;
+    }
+
+    .tl-item {
+      position: relative;
+      padding: 4px 0 4px 76px;
+      margin-bottom: 22px;
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity .55s var(--ease), transform .55s var(--ease);
+    }
+    .tl-item.visible { opacity: 1; transform: translateY(0); }
+
+    /* Node on the spine */
+    .tl-node {
+      position: absolute;
+      left: 24px; top: 22px;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: var(--surface);
+      display: grid; place-items: center;
+      font-size: 12px;
+      z-index: 1;
+      transition: box-shadow .25s var(--ease), transform .25s var(--ease);
+    }
+    .tl-item.is-day .tl-node {
+      border: 2px solid var(--day);
+      box-shadow: 0 0 0 6px var(--day-ring);
+    }
+    .tl-item.is-transport .tl-node {
+      border: 2px solid var(--transport);
+      box-shadow: 0 0 0 6px var(--transport-ring);
+    }
+    .tl-item:hover .tl-node { transform: scale(1.08); }
+
+    /* Card */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: var(--r);
-      box-shadow: var(--shadow);
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow-sm);
       overflow: hidden;
-      transition: box-shadow .15s;
+      transition: box-shadow .25s var(--ease), transform .25s var(--ease), border-color .25s;
     }
-    .card:hover { box-shadow: var(--shadow-lg); }
+    .card:hover { box-shadow: var(--shadow-md); border-color: var(--border-2); }
 
     .card-head {
-      display: grid;
-      grid-template-columns: 36px 1fr auto auto;
-      gap: 10px; align-items: center;
-      padding: 12px 16px;
-      background: var(--surface-2);
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,.85) 100%);
       border-bottom: 1px solid var(--border);
     }
+    .tl-item.is-day       .card-head { background: linear-gradient(180deg, var(--day-soft) 0%, rgba(255,244,235,.35) 100%); }
+    .tl-item.is-transport .card-head { background: linear-gradient(180deg, var(--transport-soft) 0%, rgba(217,240,242,.35) 100%); }
 
-    .day-num {
-      font-size: 10px; font-weight: 800;
-      text-transform: uppercase; letter-spacing: .1em;
-      color: var(--text-3); text-align: center;
+    .head-kind {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .14em;
+      padding: 4px 9px; border-radius: 999px;
+      background: rgba(255,255,255,.7);
     }
+    .tl-item.is-day       .head-kind { color: var(--day); }
+    .tl-item.is-transport .head-kind { color: var(--transport); }
 
-    .date-input {
-      font-size: 13px; font-weight: 600;
+    .head-date {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px; font-weight: 600; color: var(--text);
       border: none; background: transparent; outline: none;
-      color: var(--text); cursor: pointer; font-family: inherit;
+      padding: 3px 0; cursor: pointer;
+      flex: 0 0 auto;
     }
-    .date-input:focus { color: var(--accent); }
+    .head-date:focus { color: var(--day); }
+    .tl-item.is-transport .head-date:focus { color: var(--transport); }
+
+    .head-spacer { flex: 1; }
 
     .badge {
       font-size: 10px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: .07em;
-      padding: 3px 9px; border-radius: 20px;
-      border: none; cursor: pointer; outline: none;
+      text-transform: uppercase; letter-spacing: .1em;
+      padding: 4px 10px; border-radius: 999px;
+      border: none; outline: none; cursor: pointer;
       appearance: none; -webkit-appearance: none;
       font-family: inherit;
     }
-    .badge-idea      { background: var(--surface-2); color: var(--text-3); }
-    .badge-tentative { background: var(--blue-bg);   color: var(--blue); }
-    .badge-booked    { background: var(--green-bg);  color: var(--green); }
+    .badge-idea      { background: var(--idea-bg); color: var(--idea-fg); }
+    .badge-tentative { background: var(--tent-bg); color: var(--tent-fg); }
+    .badge-booked    { background: var(--book-bg); color: var(--book-fg); }
 
     .card-body {
-      padding: 16px;
+      padding: 16px 18px 18px;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 14px 20px;
     }
-
-    .field { display: flex; flex-direction: column; gap: 4px; }
+    .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
     .field.span2 { grid-column: 1 / -1; }
-
     .label {
-      font-size: 10px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: .1em;
+      font-size: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .11em;
       color: var(--text-3);
     }
-
     .inp {
-      font-size: 14px; color: var(--text);
-      border: none; border-bottom: 1.5px solid transparent;
-      background: transparent; outline: none; padding: 2px 0;
-      width: 100%; transition: border-color .15s;
-      font-family: inherit;
+      font: 400 14px/1.5 'Inter', sans-serif;
+      color: var(--text);
+      border: none;
+      border-bottom: 1.5px solid transparent;
+      background: transparent;
+      outline: none; padding: 3px 0;
+      width: 100%; min-width: 0;
+      transition: border-color .15s;
     }
-    .inp:focus { border-bottom-color: var(--accent); }
+    .inp:focus { border-bottom-color: var(--day); }
+    .tl-item.is-transport .inp:focus { border-bottom-color: var(--transport); }
     .inp::placeholder { color: var(--text-3); }
+    textarea.inp { resize: none; min-height: 40px; line-height: 1.55; font-family: inherit; }
 
-    textarea.inp { resize: none; min-height: 40px; line-height: 1.5; }
+    /* Transport mode select (styled like badge inside head) */
+    .mode-sel {
+      font-family: inherit;
+      font-size: 13px; font-weight: 600;
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 999px;
+      padding: 4px 10px 4px 8px;
+      color: var(--text);
+      outline: none; cursor: pointer;
+    }
+    .mode-sel:focus { border-color: var(--transport); }
 
-    /* ── Add Day ── */
+    /* ───────── Add row ───────── */
+    .add-row {
+      display: flex; gap: 10px; padding-left: 76px;
+      margin-top: 14px;
+    }
     .add-btn {
-      display: flex; align-items: center; justify-content: center; gap: 7px;
-      width: 100%; padding: 14px;
-      border: 2px dashed var(--border);
-      border-radius: var(--r);
-      background: transparent; cursor: pointer;
-      color: var(--text-3); font-size: 14px; font-weight: 500;
-      transition: all .15s; margin-top: 6px; font-family: inherit;
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px dashed var(--border-2);
+      color: var(--text-2);
+      font: 500 13px/1 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all .18s var(--ease);
     }
-    .add-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+    .add-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+    .add-btn.day:hover       { border-color: var(--day);       color: var(--day);       background: var(--day-soft); }
+    .add-btn.transport:hover { border-color: var(--transport); color: var(--transport); background: var(--transport-soft); }
 
-    /* ── Toast ── */
+    /* ───────── Empty ───────── */
+    .empty {
+      padding: 80px 24px; text-align: center; color: var(--text-3);
+      font-family: 'Instrument Serif', serif; font-style: italic; font-size: 20px;
+    }
+
+    /* ───────── Toast ───────── */
     .toast {
-      position: fixed; bottom: 24px; right: 24px;
+      position: fixed; bottom: 26px; left: 50%;
+      transform: translate(-50%, 60px); opacity: 0;
       background: var(--text); color: #fff;
-      padding: 11px 18px; border-radius: var(--r-sm);
-      font-size: 13px; font-weight: 500;
+      padding: 11px 20px; border-radius: 999px;
+      font: 500 13px 'Inter', sans-serif;
       box-shadow: var(--shadow-lg);
-      transform: translateY(60px); opacity: 0;
-      transition: transform .28s cubic-bezier(.34,1.56,.64,1), opacity .2s;
+      transition: transform .35s var(--ease), opacity .22s;
       z-index: 999; pointer-events: none;
+      max-width: calc(100vw - 48px);
     }
-    .toast.on { transform: translateY(0); opacity: 1; }
-    .toast.ok  { background: var(--green); }
-    .toast.bad { background: var(--red); }
+    .toast.on  { transform: translate(-50%, 0); opacity: 1; }
+    .toast.ok  { background: #1f7f52; }
+    .toast.bad { background: #b0293e; }
 
-    /* ── Empty ── */
-    .empty { text-align: center; padding: 56px 24px; color: var(--text-3); }
-    .empty-icon { font-size: 36px; margin-bottom: 10px; }
-    .empty p { font-size: 14px; }
-
-    /* ── Responsive ── */
-    @media (max-width: 560px) {
-      .header { padding: 0 16px; }
-      .main { padding: 20px 14px; }
-      .card-body { grid-template-columns: 1fr; }
+    /* ───────── Responsive ───────── */
+    @media (max-width: 640px) {
+      .topbar-inner { padding: 12px 14px; }
+      .stage { padding: 32px 14px 100px; }
+      .intro { padding-left: 62px; font-size: 16px; }
+      .tl::before { left: 28px; }
+      .tl-node    { left: 16px; top: 18px; width: 24px; height: 24px; }
+      .tl-item    { padding-left: 62px; }
+      .add-row    { padding-left: 62px; flex-wrap: wrap; }
+      .card-body { grid-template-columns: 1fr; gap: 12px; }
       .field.span2 { grid-column: 1; }
-      .card-head { grid-template-columns: 28px 1fr auto auto; }
+      .card-head { flex-wrap: wrap; }
+      .brand-title { font-size: 22px; }
+      .btn { padding: 7px 12px; font-size: 12px; }
     }
   </style>
 </head>
 <body>
 
-<header class="header">
-  <div class="header-left">
-    <input class="trip-title" id="tripTitle" type="text" value="Our Trip ✈️" spellcheck="false" />
-    <div class="trip-meta" id="tripMeta"></div>
-  </div>
-  <div class="header-right">
-    <span class="status-dot" id="statusDot"></span>
-    <button class="btn btn-outline" id="undoBtn" onclick="undo()" disabled>↩ Undo</button>
-    <button class="btn btn-outline" onclick="loadFromSheets()">↓ Load</button>
-    <button class="btn btn-dark"    onclick="saveToSheets()">↑ Save now</button>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <input class="brand-title" id="tripTitle" type="text" value="Our Trip" spellcheck="false" />
+      <span class="brand-meta" id="tripMeta"></span>
+    </div>
+    <div class="toolbar">
+      <span class="status" id="statusDot"></span>
+      <button class="btn btn-ghost" id="undoBtn" onclick="undo()" disabled>↩ Undo</button>
+      <button class="btn btn-ghost" onclick="loadFromSheets()">↓ Load</button>
+      <button class="btn btn-dark"  onclick="saveToSheets()">Save now</button>
+    </div>
   </div>
 </header>
 
-<main class="main">
+<main class="stage">
+  <p class="intro">A day-by-day chronology. Scroll down to move forward in time.</p>
 
-  <div class="days" id="days"></div>
+  <div class="tl" id="tl"></div>
 
-  <button class="add-btn" onclick="addDay()">+ Add day</button>
-
+  <div class="add-row">
+    <button class="add-btn day"       onclick="addDay()">＋ Add day</button>
+    <button class="add-btn transport" onclick="addTransport()">＋ Add transport</button>
+  </div>
 </main>
 
 <div class="toast" id="toast"></div>
 
 <script>
-  const LS       = 'tp_items_v1';
+  // ── Config ───────────────────────────────────────────────────
+  const LS       = 'tp_items_v2';
   const LS_TITLE = 'tp_title';
   const BIN_ID   = '69e6843eaaba8821971d19a9';
   const BIN_KEY  = '$2a$10$I4VrBBHY70cCt0j8YaGuNOfCYbsoQx7yxf/tcCtn8dTdR7yNBRVxq';
   const BIN_URL  = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+  const SAVE_DEBOUNCE_MS = 10000;
 
+  const MODES = {
+    flight: { icon: '✈️', label: 'Flight' },
+    train:  { icon: '🚆', label: 'Train'  },
+    car:    { icon: '🚗', label: 'Car'    },
+    bus:    { icon: '🚌', label: 'Bus'    },
+    boat:   { icon: '⛴️', label: 'Boat'   },
+    walk:   { icon: '🚶', label: 'Walk'   },
+    other:  { icon: '📍', label: 'Other'  },
+  };
+
+  // ── State ────────────────────────────────────────────────────
   let items     = [];
   let history   = [];
   let saveTimer = null;
   let dirty     = false;
   let saving    = false;
-  const SAVE_DEBOUNCE_MS = 10000;
+  let io        = null;
 
-  // ── Bootstrap ────────────────────────────────────────────────
+  // ── Boot ─────────────────────────────────────────────────────
   function init() {
     const t = localStorage.getItem(LS_TITLE);
     if (t) document.getElementById('tripTitle').value = t;
@@ -255,8 +409,6 @@
       updateMeta();
     });
 
-    load();
-
     document.addEventListener('keydown', e => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
     });
@@ -264,27 +416,50 @@
     window.addEventListener('beforeunload', e => {
       if (dirty || saving) { e.preventDefault(); e.returnValue = ''; }
     });
+
+    io = new IntersectionObserver(entries => {
+      entries.forEach(en => { if (en.isIntersecting) en.target.classList.add('visible'); });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+    load();
   }
 
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 5); }
+
+  function seed() {
+    return [
+      { id: uid(), type: 'day', date: '', city: '', activity: '', time: '', notes: '', status: 'idea' },
+    ];
+  }
+
+  // ── Local fallback ───────────────────────────────────────────
   function loadLocal() {
     try {
       const s = localStorage.getItem(LS);
       items = s ? JSON.parse(s) : seed();
     } catch { items = seed(); }
+    // migrate legacy items
+    items = items.map(migrate);
     render();
   }
 
+  function migrate(it) {
+    if (!it.type) it.type = 'day';
+    return it;
+  }
+
+  function saveLocal() { localStorage.setItem(LS, JSON.stringify(items)); }
+
+  // ── Remote ───────────────────────────────────────────────────
   async function load() {
-    const el = document.getElementById('statusDot');
-    el.className = 'status-dot saving';
-    el.textContent = '↓ loading…';
+    setState('saving'); setStatusText('↓ loading…');
     try {
       const res  = await fetch(`${BIN_URL}/latest`, { headers: { 'X-Master-Key': BIN_KEY } });
       if (!res.ok) throw new Error('HTTP ' + res.status);
-      const data  = await res.json();
+      const data = await res.json();
       const saved = data?.record?.items;
       if (Array.isArray(saved)) {
-        items = saved.length ? saved : seed();
+        items = (saved.length ? saved : seed()).map(migrate);
         history = [];
         document.getElementById('undoBtn').disabled = true;
         dirty = false;
@@ -298,46 +473,129 @@
     } catch (e) {
       console.error(e);
       loadLocal();
-      setState('error');
+      setState('err');
       toast('Could not reach server — showing local data', 'bad');
     }
   }
 
-  function seed() {
-    return [{ id: uid(), date: '', city: '', activity: '', time: '', notes: '', status: 'idea' }];
+  function scheduleSave() {
+    dirty = true;
+    setState('dirty');
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(doSave, SAVE_DEBOUNCE_MS);
   }
 
-  function uid() {
-    return Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+  async function doSave() {
+    clearTimeout(saveTimer);
+    if (saving) return;
+    if (!dirty) { setState('saved'); return; }
+    saving = true; dirty = false;
+    const snapshot = JSON.stringify({ items });
+    setState('saving');
+    try {
+      const res = await fetch(BIN_URL, {
+        method:  'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-Master-Key': BIN_KEY },
+        body:    snapshot,
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      if (!data?.record) throw new Error('Unexpected response');
+      saving = false;
+      if (dirty) scheduleSave();
+      else {
+        setState('saved');
+        setTimeout(() => { if (!dirty && !saving) setState('idle'); }, 3000);
+      }
+    } catch (e) {
+      console.error('save failed:', e);
+      saving = false; dirty = true;
+      setState('err');
+      saveTimer = setTimeout(doSave, SAVE_DEBOUNCE_MS);
+      toast('Save failed — will retry', 'bad');
+    }
   }
+
+  function saveToSheets() { dirty = true; clearTimeout(saveTimer); doSave(); }
+
+  async function loadFromSheets() {
+    if (dirty || saving) {
+      if (!confirm('You have unsaved changes. Load will overwrite them. Continue?')) return;
+    }
+    await load();
+  }
+
+  function setState(s) { setStatusClass(s); setStatusText(stateLabel(s)); }
+  function stateLabel(s) {
+    switch (s) {
+      case 'idle':   return '';
+      case 'dirty':  return '· unsaved';
+      case 'saving': return '↑ saving…';
+      case 'saved':  return '✓ saved';
+      case 'err':    return '⚠ retrying';
+    }
+    return '';
+  }
+  function setStatusClass(s) {
+    const el = document.getElementById('statusDot');
+    el.className = 'status' + (s === 'idle' ? '' :
+                               s === 'dirty' || s === 'saving' ? ' saving' :
+                               s === 'saved' ? ' saved' :
+                               s === 'err' ? ' err' : '');
+  }
+  function setStatusText(t) { document.getElementById('statusDot').textContent = t; }
 
   // ── Render ───────────────────────────────────────────────────
   function render() {
-    const el = document.getElementById('days');
-    el.innerHTML = '';
+    const tl = document.getElementById('tl');
+    tl.innerHTML = '';
 
     if (!items.length) {
-      el.innerHTML = '<div class="empty"><div class="empty-icon">🗺️</div><p>No days yet.</p></div>';
+      tl.innerHTML = '<div class="empty">No entries yet. Add a day or a flight below.</div>';
       updateMeta(); return;
     }
 
-    items.forEach((item, i) => {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <div class="card-head">
-          <span class="day-num">${i + 1}</span>
-          <input class="date-input" type="date" value="${item.date}"
+    const ordered = sortItems(items);
+    ordered.forEach(item => {
+      tl.appendChild(item.type === 'transport' ? renderTransport(item) : renderDay(item));
+    });
+
+    // reveal on scroll
+    document.querySelectorAll('.tl-item').forEach(el => io.observe(el));
+
+    saveLocal();
+    updateMeta();
+  }
+
+  function sortItems(arr) {
+    return [...arr].sort((a, b) => {
+      const da = a.date || '9999-12-31';
+      const db = b.date || '9999-12-31';
+      if (da !== db) return da.localeCompare(db);
+      const ta = (a.time || a.departTime || '');
+      const tb = (b.time || b.departTime || '');
+      return ta.localeCompare(tb);
+    });
+  }
+
+  function renderDay(item) {
+    const el = document.createElement('article');
+    el.className = 'tl-item is-day';
+    el.innerHTML = `
+      <div class="tl-node">☀</div>
+      <div class="card">
+        <header class="card-head">
+          <span class="head-kind">Day</span>
+          <input class="head-date" type="date" value="${item.date}"
                  onchange="upd('${item.id}','date',this.value)" />
+          <span class="head-spacer"></span>
           <select class="badge badge-${item.status}"
                   onchange="updStatus('${item.id}',this)">
-            <option value="idea"      ${item.status==='idea'      ?'selected':''}>Idea</option>
-            <option value="tentative" ${item.status==='tentative' ?'selected':''}>Tentative</option>
-            <option value="booked"    ${item.status==='booked'    ?'selected':''}>Booked ✓</option>
+            ${statusOptions(item.status)}
           </select>
-          <button class="btn btn-ghost danger" title="Remove"
-                  onclick="remove('${item.id}')">✕</button>
-        </div>
+          <button class="btn btn-tiny danger" title="Remove"
+                  onclick="removeItem('${item.id}')">✕</button>
+        </header>
         <div class="card-body">
           <div class="field">
             <label class="label">City / Destination</label>
@@ -346,7 +604,7 @@
                    onchange="upd('${item.id}','city',this.value)" />
           </div>
           <div class="field">
-            <label class="label">Time</label>
+            <label class="label">Time of day</label>
             <input class="inp" type="text" value="${x(item.time)}"
                    placeholder="e.g. Morning"
                    onchange="upd('${item.id}','time',this.value)" />
@@ -363,54 +621,114 @@
                       placeholder="Links, reservations, things to remember…"
                       onchange="upd('${item.id}','notes',this.value)">${x(item.notes)}</textarea>
           </div>
-        </div>`;
-      el.appendChild(card);
-    });
+        </div>
+      </div>`;
+    return el;
+  }
 
-    saveLocal();
-    updateMeta();
+  function renderTransport(item) {
+    const mode = MODES[item.mode] || MODES.other;
+    const el = document.createElement('article');
+    el.className = 'tl-item is-transport';
+    el.innerHTML = `
+      <div class="tl-node">${mode.icon}</div>
+      <div class="card">
+        <header class="card-head">
+          <span class="head-kind">${mode.label}</span>
+          <input class="head-date" type="date" value="${item.date}"
+                 onchange="upd('${item.id}','date',this.value)" />
+          <select class="mode-sel" onchange="upd('${item.id}','mode',this.value); render()">
+            ${Object.entries(MODES).map(([k,v]) =>
+              `<option value="${k}" ${item.mode===k?'selected':''}>${v.icon}  ${v.label}</option>`
+            ).join('')}
+          </select>
+          <span class="head-spacer"></span>
+          <select class="badge badge-${item.status}"
+                  onchange="updStatus('${item.id}',this)">
+            ${statusOptions(item.status)}
+          </select>
+          <button class="btn btn-tiny danger" title="Remove"
+                  onclick="removeItem('${item.id}')">✕</button>
+        </header>
+        <div class="card-body">
+          <div class="field">
+            <label class="label">From</label>
+            <input class="inp" type="text" value="${x(item.from)}"
+                   placeholder="e.g. Montevideo (MVD)"
+                   onchange="upd('${item.id}','from',this.value)" />
+          </div>
+          <div class="field">
+            <label class="label">To</label>
+            <input class="inp" type="text" value="${x(item.to)}"
+                   placeholder="e.g. Paris (CDG)"
+                   onchange="upd('${item.id}','to',this.value)" />
+          </div>
+          <div class="field">
+            <label class="label">Departure</label>
+            <input class="inp" type="time" value="${x(item.departTime)}"
+                   onchange="upd('${item.id}','departTime',this.value)" />
+          </div>
+          <div class="field">
+            <label class="label">Arrival</label>
+            <input class="inp" type="time" value="${x(item.arriveTime)}"
+                   onchange="upd('${item.id}','arriveTime',this.value)" />
+          </div>
+          <div class="field span2">
+            <label class="label">Reference / confirmation</label>
+            <input class="inp" type="text" value="${x(item.confirmation)}"
+                   placeholder="e.g. AF1234 · booking code ABC123"
+                   onchange="upd('${item.id}','confirmation',this.value)" />
+          </div>
+          <div class="field span2">
+            <label class="label">Notes</label>
+            <textarea class="inp" rows="2"
+                      placeholder="Seat, terminal, baggage, links…"
+                      onchange="upd('${item.id}','notes',this.value)">${x(item.notes)}</textarea>
+          </div>
+        </div>
+      </div>`;
+    return el;
+  }
+
+  function statusOptions(current) {
+    return ['idea','tentative','booked'].map(s => {
+      const label = s === 'booked' ? 'Booked ✓' : s[0].toUpperCase() + s.slice(1);
+      return `<option value="${s}" ${current===s?'selected':''}>${label}</option>`;
+    }).join('');
   }
 
   function x(s) {
-    if (!s) return '';
-    return String(s)
-      .replace(/&/g,'&amp;').replace(/"/g,'&quot;')
-      .replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    if (s == null) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
+  // ── Meta (date range in header) ──────────────────────────────
   function updateMeta() {
     const dates = items.map(i => i.date).filter(Boolean).sort();
     const n = items.length;
-    const part = n ? `${n} day${n !== 1 ? 's' : ''}` : '';
-    if (dates.length >= 2) {
-      document.getElementById('tripMeta').textContent =
-        `${fmt(dates[0])} → ${fmt(dates[dates.length-1])}  ·  ${part}`;
-    } else if (dates.length === 1) {
-      document.getElementById('tripMeta').textContent = `${fmt(dates[0])}  ·  ${part}`;
-    } else {
-      document.getElementById('tripMeta').textContent = part;
-    }
+    const part = n ? `${n} entr${n !== 1 ? 'ies' : 'y'}` : '';
+    const meta = document.getElementById('tripMeta');
+    if (dates.length >= 2) meta.textContent = `${fmt(dates[0])} → ${fmt(dates[dates.length-1])} · ${part}`;
+    else if (dates.length === 1) meta.textContent = `${fmt(dates[0])} · ${part}`;
+    else meta.textContent = part;
   }
-
   function fmt(s) {
     if (!s) return '';
     return new Date(s + 'T12:00:00').toLocaleDateString('en-US',
       { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
-  // ── History / Undo ────────────────────────────────────────────
+  // ── History / Undo ───────────────────────────────────────────
   function pushHistory() {
     history.push(JSON.stringify(items));
     if (history.length > 50) history.shift();
     document.getElementById('undoBtn').disabled = false;
   }
-
   function undo() {
     if (!history.length) return;
     items = JSON.parse(history.pop());
     document.getElementById('undoBtn').disabled = history.length === 0;
-    render();
-    scheduleSave();
+    render(); scheduleSave();
     toast('Undone', '');
   }
 
@@ -420,104 +738,43 @@
     items = items.map(i => i.id === id ? { ...i, [field]: val } : i);
     saveLocal(); updateMeta(); scheduleSave();
   }
-
   function updStatus(id, sel) {
     sel.className = `badge badge-${sel.value}`;
     upd(id, 'status', sel.value);
   }
-
   function addDay() {
     pushHistory();
-    items.push({ id: uid(), date: '', city: '', activity: '', time: '', notes: '', status: 'idea' });
+    items.push({ id: uid(), type: 'day', date: lastDate(), city: '', activity: '', time: '', notes: '', status: 'idea' });
     render(); scheduleSave();
-    setTimeout(() => {
-      const cards = document.querySelectorAll('.card');
-      if (cards.length) cards[cards.length-1].scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 60);
+    scrollToLast();
   }
-
-  function remove(id) {
+  function addTransport() {
+    pushHistory();
+    items.push({
+      id: uid(), type: 'transport', date: lastDate(),
+      mode: 'flight', from: '', to: '',
+      departTime: '', arriveTime: '',
+      confirmation: '', notes: '', status: 'idea',
+    });
+    render(); scheduleSave();
+    scrollToLast();
+  }
+  function removeItem(id) {
     pushHistory();
     items = items.filter(i => i.id !== id);
     render(); scheduleSave();
   }
 
-  function saveLocal() {
-    localStorage.setItem(LS, JSON.stringify(items));
+  function lastDate() {
+    const dates = items.map(i => i.date).filter(Boolean).sort();
+    return dates[dates.length - 1] || '';
   }
-
-  function scheduleSave() {
-    dirty = true;
-    setState('dirty');
-    clearTimeout(saveTimer);
-    saveTimer = setTimeout(doSave, SAVE_DEBOUNCE_MS);
+  function scrollToLast() {
+    setTimeout(() => {
+      const cards = document.querySelectorAll('.tl-item');
+      if (cards.length) cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 80);
   }
-
-  // ── JSONBin ───────────────────────────────────────────────────
-  async function doSave() {
-    clearTimeout(saveTimer);
-    if (saving) return;                 // one in flight already
-    if (!dirty) { setState('saved'); return; }
-
-    saving = true;
-    dirty  = false;                     // edits during save will flip this back
-    const snapshot = JSON.stringify({ items });
-    setState('saving');
-
-    try {
-      const res = await fetch(BIN_URL, {
-        method:  'PUT',
-        headers: { 'Content-Type': 'application/json', 'X-Master-Key': BIN_KEY },
-        body:    snapshot,
-      });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
-      if (!data?.record) throw new Error('Unexpected response');
-      saving = false;
-
-      if (dirty) {                      // new edits came in during save
-        scheduleSave();
-      } else {
-        setState('saved');
-        setTimeout(() => { if (!dirty && !saving) setState('idle'); }, 3000);
-      }
-    } catch (e) {
-      console.error('save failed:', e);
-      saving = false;
-      dirty  = true;
-      setState('error');
-      clearTimeout(saveTimer);
-      saveTimer = setTimeout(doSave, SAVE_DEBOUNCE_MS); // retry
-      toast('Save failed — will retry', 'bad');
-    }
-  }
-
-  // Manual "Save now" — cancels pending debounce and saves immediately
-  function saveToSheets() {
-    dirty = true;
-    clearTimeout(saveTimer);
-    doSave();
-  }
-
-  // Manual "Load"
-  async function loadFromSheets() {
-    if (dirty || saving) {
-      if (!confirm('You have unsaved changes. Load will overwrite them. Continue?')) return;
-    }
-    await load();
-  }
-
-  function setState(state) {
-    const el = document.getElementById('statusDot');
-    switch (state) {
-      case 'idle':   el.className = 'status-dot';        el.textContent = '';            break;
-      case 'dirty':  el.className = 'status-dot saving'; el.textContent = '· unsaved';   break;
-      case 'saving': el.className = 'status-dot saving'; el.textContent = '↑ saving…';   break;
-      case 'saved':  el.className = 'status-dot saved';  el.textContent = '✓ saved';     break;
-      case 'error':  el.className = 'status-dot err';    el.textContent = '⚠ retrying'; break;
-    }
-  }
-
 
   // ── Toast ─────────────────────────────────────────────────────
   let toastTimer;
@@ -526,7 +783,7 @@
     el.textContent = msg;
     el.className = 'toast on' + (cls ? ' ' + cls : '');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => { el.className = 'toast'; }, 3500);
+    toastTimer = setTimeout(() => { el.className = 'toast'; }, 3000);
   }
 
   init();
