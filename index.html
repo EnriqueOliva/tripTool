@@ -422,6 +422,27 @@
       align-self: flex-start;
       transition: all .15s var(--ease);
     }
+
+    /* Date-picker button styled to match the .inp text inputs */
+    .inp-date-btn {
+      font: 400 17px/1.5 'Inter', sans-serif;
+      color: var(--text);
+      background: transparent;
+      border: none;
+      border-bottom: 1.5px solid transparent;
+      outline: none;
+      padding: 4px 0;
+      width: 100%;
+      cursor: pointer;
+      text-align: left;
+      font-family: inherit;
+      transition: border-bottom-color .15s, color .15s;
+    }
+    .inp-date-btn:hover { border-bottom-color: var(--border-2); }
+    .inp-date-btn.empty { color: var(--text-3); font-style: italic; font-weight: 500; }
+    .card.type-hotel     .inp-date-btn:focus { border-bottom-color: var(--hotel); }
+    .card.type-activity  .inp-date-btn:focus { border-bottom-color: var(--activity); }
+    .card.type-transport .inp-date-btn:focus { border-bottom-color: var(--transport); }
     .inline-add-btn:hover {
       border-color: var(--activity);
       color: var(--activity);
@@ -1246,8 +1267,14 @@
         </div>
         <div class="field">
           <label class="label">Check-in date</label>
-          <input class="inp" type="date" value="${x(c.checkInDate)}"
-                 onchange="upd('${c.id}','checkInDate',this.value)" />
+          <span class="date-wrap" style="display:block">
+            <button type="button" class="inp-date-btn ${c.checkInDate ? '' : 'empty'}"
+                    onclick="openDate(this)">
+              ${c.checkInDate ? fmtDate(c.checkInDate) : 'Pick date'}
+            </button>
+            <input class="head-date-hidden" type="date" value="${x(c.checkInDate)}"
+                   onchange="upd('${c.id}','checkInDate',this.value); render()" />
+          </span>
         </div>
         <div class="field">
           <label class="label">Check-in time</label>
@@ -1256,8 +1283,14 @@
         </div>
         <div class="field">
           <label class="label">Check-out date</label>
-          <input class="inp" type="date" value="${x(c.checkOutDate)}"
-                 onchange="upd('${c.id}','checkOutDate',this.value)" />
+          <span class="date-wrap" style="display:block">
+            <button type="button" class="inp-date-btn ${c.checkOutDate ? '' : 'empty'}"
+                    onclick="openDate(this)">
+              ${c.checkOutDate ? fmtDate(c.checkOutDate) : 'Pick date'}
+            </button>
+            <input class="head-date-hidden" type="date" value="${x(c.checkOutDate)}"
+                   onchange="upd('${c.id}','checkOutDate',this.value); render()" />
+          </span>
         </div>
         <div class="field">
           <label class="label">Check-out time</label>
