@@ -388,6 +388,27 @@
       outline: none; padding: 4px 0;
       width: 100%; min-width: 0;
     }
+
+    /* Input with a clear-button suffix */
+    .inp-row { display: flex; align-items: center; gap: 8px; }
+    .inp-row .inp { flex: 1; }
+    .inp-clear {
+      flex-shrink: 0;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-3);
+      cursor: pointer;
+      font: 500 16px/1 'Inter', sans-serif;
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: all .15s var(--ease);
+    }
+    .inp-clear:hover {
+      color: var(--danger);
+      border-color: var(--danger);
+      background: var(--danger-bg);
+    }
     .card.type-activity  .inp:focus { border-bottom-color: var(--activity); }
     .card.type-transport .inp:focus { border-bottom-color: var(--transport); }
     .card.type-hotel     .inp:focus { border-bottom-color: var(--hotel); }
@@ -620,7 +641,6 @@
   const BIN_KEY   = '$2a$10$I4VrBBHY70cCt0j8YaGuNOfCYbsoQx7yxf/tcCtn8dTdR7yNBRVxq';
   const BIN_URL   = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
   const SAVE_DEBOUNCE_MS  = 10000;
-  const LOAD_TIMEOUT_MS   = 8000;
   const LOAD_SLOW_HINT_MS = 2500;
 
   const MODES = {
@@ -796,16 +816,13 @@
   // ── Remote ───────────────────────────────────────────────────
   async function load() {
     setState('saving'); setStatusText('↓ loading…');
-    const controller = new AbortController();
-    const timeout   = setTimeout(() => controller.abort(), LOAD_TIMEOUT_MS);
-    const slowHint  = setTimeout(() => {
+    const slowHint = setTimeout(() => {
       document.getElementById('loaderSub')?.classList.add('show');
     }, LOAD_SLOW_HINT_MS);
 
     try {
       const res  = await fetch(`${BIN_URL}/latest`, {
         headers: { 'X-Master-Key': BIN_KEY },
-        signal:  controller.signal,
       });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
@@ -819,12 +836,9 @@
       console.error(e);
       loadLocal();
       setState('err');
-      const msg = e.name === 'AbortError'
-        ? 'Server too slow — showing local data'
-        : 'Could not reach server — showing local data';
-      toast(msg, 'bad');
+      toast('Could not reach server — showing local data', 'bad');
     } finally {
-      clearTimeout(timeout); clearTimeout(slowHint);
+      clearTimeout(slowHint);
       hideLoader();
     }
   }
@@ -1126,8 +1140,11 @@
         </div>
         <div class="field">
           <label class="label">Time</label>
-          <input class="inp" type="time" value="${x(c.time)}"
-                 onchange="upd('${c.id}','time',this.value)" />
+          <div class="inp-row">
+            <input class="inp" type="time" value="${x(c.time)}"
+                   onchange="upd('${c.id}','time',this.value)" />
+            ${c.time ? `<button class="inp-clear" title="Clear time" onclick="upd('${c.id}','time',''); render()">×</button>` : ''}
+          </div>
         </div>
         <div class="field span2">
           <label class="label">Activity</label>
