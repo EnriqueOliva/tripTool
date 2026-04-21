@@ -219,7 +219,7 @@
     .days::before {
       content: "";
       position: absolute;
-      left: 24px; top: 18px; bottom: 18px;
+      left: 21px; top: 18px; bottom: 18px;
       width: 2px;
       background: linear-gradient(
         to bottom,
@@ -234,15 +234,15 @@
 
     .day-block {
       position: relative;
+      padding-left: 56px; /* space for spine + dot, before the header card */
       opacity: 0; transform: translateY(14px);
       transition: opacity .35s var(--ease), transform .35s var(--ease);
     }
     .day-block.visible { opacity: 1; transform: translateY(0); }
 
-    /* Day header */
+    /* Day header (card) — sits inside the day-block's indented content area */
     .day-header {
-      position: relative;
-      padding: 18px 20px 18px 72px;
+      padding: 16px 20px;
       background: var(--surface);
       border: 1px solid var(--border-2);
       border-radius: var(--r-lg);
@@ -252,14 +252,15 @@
     }
     .day-header-main { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 
+    /* Dot sits on the spine, clearly to the LEFT of the header card */
     .day-dot {
-      position: absolute; left: 14px; top: 50%;
-      transform: translateY(-50%);
-      width: 22px; height: 22px;
+      position: absolute;
+      left: 10px; top: 22px;
+      width: 24px; height: 24px;
       border-radius: 50%;
       background: var(--surface);
       border: 2px solid var(--activity);
-      box-shadow: 0 0 0 6px var(--activity-ring);
+      box-shadow: 0 0 0 5px var(--activity-ring);
     }
     .day-num {
       font-size: 12px; font-weight: 700;
@@ -285,7 +286,7 @@
     /* Cards within a day */
     .day-cards {
       display: flex; flex-direction: column; gap: 10px;
-      padding: 14px 0 14px 56px;
+      padding: 14px 0;
     }
 
     .card {
@@ -500,7 +501,6 @@
 
     /* ───────── Big add buttons ───────── */
     .day-adds-label {
-      margin-left: 56px;
       margin-top: 18px; margin-bottom: 8px;
       font-size: 12px; font-weight: 700;
       text-transform: uppercase; letter-spacing: .16em;
@@ -512,7 +512,6 @@
       background: var(--border);
     }
     .day-adds {
-      margin-left: 56px;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
@@ -682,23 +681,23 @@
       .brand-meta  { font-size: 12px; margin-top: 1px; }
 
       .days { gap: 22px; }
-      .days::before { left: 16px; top: -4px; bottom: -4px; }
+      .days::before { left: 17px; top: -4px; bottom: -4px; }
+      .day-block { padding-left: 44px; }
       .day-header {
-        padding: 10px 12px 10px 44px;
+        padding: 10px 12px;
         flex-wrap: wrap;
         gap: 6px;
       }
-      .day-dot { left: 6px; width: 20px; height: 20px; }
+      .day-dot { left: 8px; top: 15px; width: 20px; height: 20px; box-shadow: 0 0 0 4px var(--activity-ring); }
       .day-header-main { min-width: 0; flex: 1; gap: 2px; }
       .day-title { font-size: 17px; letter-spacing: -0.01em; line-height: 1.2; }
       .day-weekday { font-size: 13px; margin-right: 4px; }
       .day-num { font-size: 10px; letter-spacing: .15em; }
       .day-count { font-size: 11px; padding: 3px 9px; flex-shrink: 0; }
 
-      .day-cards { padding: 10px 0 10px 22px; gap: 10px; }
-      .day-adds-label { margin-left: 22px; font-size: 10px; margin-top: 8px; margin-bottom: 6px; }
+      .day-cards { padding: 10px 0; gap: 10px; }
+      .day-adds-label { font-size: 10px; margin-top: 8px; margin-bottom: 6px; }
       .day-adds {
-        margin-left: 22px;
         grid-template-columns: 1fr;
         gap: 6px;
       }
@@ -719,7 +718,12 @@
 
       .type-pill { font-size: 10px; padding: 3px 9px; letter-spacing: .1em; }
       .badge     { font-size: 10px; padding: 3px 9px; }
-      .mode-sel  { font-size: 12px; padding: 4px 10px 4px 8px; max-width: 100%; }
+      /* Mode selector moves to its own row on narrow screens */
+      .mode-sel  {
+        font-size: 12px; padding: 4px 10px 4px 8px;
+        flex: 1 1 100%;
+        order: 10; /* after head-right so it wraps below row 1 */
+      }
       .drag-handle { width: 28px; height: 28px; font-size: 16px; }
       .inp       { font-size: 16px; } /* ≥16px prevents iOS zoom */
       .label     { font-size: 11px; }
@@ -751,12 +755,11 @@
 
     @media (max-width: 400px) {
       .stage { padding: 12px 12px 100px; }
-      .days::before { left: 12px; }
-      .day-header { padding: 10px 10px 10px 38px; }
-      .day-dot { left: 2px; width: 20px; height: 20px; }
+      .days::before { left: 14px; }
+      .day-block { padding-left: 38px; }
+      .day-header { padding: 10px 10px; }
+      .day-dot { left: 6px; top: 14px; width: 18px; height: 18px; box-shadow: 0 0 0 4px var(--activity-ring); }
       .day-title { font-size: 16px; }
-      .day-cards { padding-left: 18px; }
-      .day-adds, .day-adds-label { margin-left: 18px; }
       .brand-title { font-size: 20px; }
       .card-head   { padding: 9px 11px; gap: 6px; }
       .card-body   { padding: 11px; gap: 11px; }
@@ -848,8 +851,8 @@
   };
 
   const TYPES = {
-    activity:  { icon: '☀',  label: 'Activity',  accent: 'activity'  },
-    transport: { icon: '✈',  label: 'Transport', accent: 'transport' },
+    activity:  { icon: '☀️', label: 'Activity',  accent: 'activity'  },
+    transport: { icon: '✈️', label: 'Transport', accent: 'transport' },
     hotel:     { icon: '🏨', label: 'Hotel',     accent: 'hotel'     },
   };
 
@@ -1272,8 +1275,8 @@
     const dayCards = state.cards.filter(c => c.date === date);
 
     el.innerHTML = `
+      <span class="day-dot"></span>
       <div class="day-header">
-        <span class="day-dot"></span>
         <div class="day-header-main">
           <span class="day-num">Day ${dayNum}</span>
           <h3 class="day-title">
@@ -1289,7 +1292,7 @@
       <div class="day-adds-label">Add</div>
       <div class="day-adds">
         <button class="day-add activity"  onclick="addCard('activity','${date}')">
-          <span class="add-ico">☀</span><span>Activity</span>
+          <span class="add-ico">☀️</span><span>Activity</span>
         </button>
         <button class="day-add transport" onclick="addCard('transport','${date}')">
           <span class="add-ico">✈️</span><span>Transport</span>
