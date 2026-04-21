@@ -555,7 +555,7 @@
     }
 
     /* ───────── Empty state ───────── */
-    .empty {
+    .empty-state {
       padding: 80px 24px; text-align: center; color: var(--text-3);
       font-style: italic; font-size: 22px;
     }
@@ -1223,7 +1223,7 @@
 
     const dates = daysBetween(state.startDate, state.endDate);
     if (!dates.length) {
-      wrap.innerHTML = `<div class="empty">Pick a start and end date to build your chronology.</div>`;
+      wrap.innerHTML = `<div class="empty-state">Pick a start and end date to build your chronology.</div>`;
       saveLocal();
       return;
     }
