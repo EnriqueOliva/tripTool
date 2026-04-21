@@ -662,106 +662,105 @@
 
     /* ───────── Responsive ───────── */
     @media (max-width: 780px) {
-      .topbar-inner { flex-wrap: wrap; gap: 10px; padding: 12px 16px; }
+      .topbar-inner { flex-wrap: wrap; gap: 8px; padding: 10px 14px; }
       .brand { flex: 1 1 100%; min-width: 0; }
       .toolbar { flex: 1 1 100%; justify-content: flex-end; gap: 6px; }
       .status { margin-right: auto; padding-left: 4px; }
-      .btn { padding: 9px 16px; font-size: 14px; min-height: 40px; }
-      .range-bar { padding: 24px 16px 0; gap: 10px; }
+      .btn { padding: 7px 13px; font-size: 13px; min-height: 34px; }
+      .range-bar { padding: 16px 14px 0; gap: 8px; }
     }
 
     @media (max-width: 560px) {
-      .stage { padding: 20px 14px 120px; }
+      .stage { padding: 14px 14px 100px; }
       .trip-description {
-        font-size: 17px; margin-bottom: 28px;
+        font-size: 16px; margin-bottom: 18px;
         margin-left: 0; padding: 6px 8px;
+        line-height: 1.45;
       }
 
-      .days { gap: 34px; }
-      .days::before { left: 18px; }
+      .brand-title { font-size: 22px; letter-spacing: -0.02em; max-width: 100%; }
+      .brand-meta  { font-size: 12px; margin-top: 1px; }
+
+      .days { gap: 22px; }
+      .days::before { left: 16px; top: -4px; bottom: -4px; }
       .day-header {
-        padding: 14px 14px 14px 52px;
+        padding: 10px 12px 10px 44px;
         flex-wrap: wrap;
-        gap: 8px;
+        gap: 6px;
       }
-      .day-dot { left: 8px; width: 22px; height: 22px; }
-      .day-header-main { min-width: 0; flex: 1; }
-      .day-title { font-size: 20px; letter-spacing: -0.01em; line-height: 1.25; }
-      .day-weekday { font-size: 13px; display: block; margin: 0 0 2px 0; }
-      .day-num { font-size: 11px; letter-spacing: .16em; }
-      .day-count { font-size: 12px; padding: 4px 10px; flex-shrink: 0; }
+      .day-dot { left: 6px; width: 20px; height: 20px; }
+      .day-header-main { min-width: 0; flex: 1; gap: 2px; }
+      .day-title { font-size: 17px; letter-spacing: -0.01em; line-height: 1.2; }
+      .day-weekday { font-size: 13px; margin-right: 4px; }
+      .day-num { font-size: 10px; letter-spacing: .15em; }
+      .day-count { font-size: 11px; padding: 3px 9px; flex-shrink: 0; }
 
-      .day-cards { padding: 12px 0 12px 28px; gap: 10px; }
-      .day-adds-label { margin-left: 28px; font-size: 11px; margin-top: 14px; }
+      .day-cards { padding: 10px 0 10px 22px; gap: 10px; }
+      .day-adds-label { margin-left: 22px; font-size: 10px; margin-top: 8px; margin-bottom: 6px; }
       .day-adds {
-        margin-left: 28px;
+        margin-left: 22px;
         grid-template-columns: 1fr;
-        gap: 8px;
+        gap: 6px;
       }
       .day-add {
-        padding: 14px 16px;
+        padding: 11px 14px;
         flex-direction: row; justify-content: flex-start;
-        gap: 12px; font-size: 15px;
+        gap: 10px; font-size: 14px;
       }
-      .day-add .add-ico { font-size: 22px; }
+      .day-add .add-ico { font-size: 20px; }
 
-      .card-head { padding: 12px 14px; gap: 8px; }
+      .card-head { padding: 10px 12px; gap: 7px; }
       .card-body {
-        padding: 14px;
+        padding: 12px;
         grid-template-columns: 1fr;
-        gap: 14px;
+        gap: 12px;
       }
       .field.span2 { grid-column: 1; }
 
-      .type-pill { font-size: 11px; padding: 4px 10px; }
-      .badge     { font-size: 11px; padding: 4px 10px; }
-      .mode-sel  { font-size: 13px; max-width: 100%; }
-      .drag-handle { width: 32px; height: 32px; font-size: 18px; }
+      .type-pill { font-size: 10px; padding: 3px 9px; letter-spacing: .1em; }
+      .badge     { font-size: 10px; padding: 3px 9px; }
+      .mode-sel  { font-size: 12px; padding: 4px 10px 4px 8px; max-width: 100%; }
+      .drag-handle { width: 28px; height: 28px; font-size: 16px; }
       .inp       { font-size: 16px; } /* ≥16px prevents iOS zoom */
-      .label     { font-size: 12px; }
-      .inp-copy  { width: 32px; height: 32px; }
-      .inp-copy svg { width: 15px; height: 15px; }
+      .label     { font-size: 11px; }
+      .inp-copy  { width: 30px; height: 30px; }
+      .inp-copy svg { width: 14px; height: 14px; }
       .ta-wrap .inp-copy { top: 4px; right: 4px; }
+      .btn-tiny  { padding: 6px 8px; font-size: 13px; }
 
-      .brand-title { font-size: 26px; }
-      .brand-meta  { font-size: 13px; }
+      .range-bar   { padding: 12px 14px 0; align-items: center; }
+      .range-picker { padding: 4px 6px; gap: 2px; flex-wrap: wrap; }
+      .range-date   { font-size: 14px; padding: 6px 10px; }
+      .range-label  { font-size: 11px; }
+      .range-arrow  { font-size: 13px; }
 
-      .range-bar   { padding: 18px 14px 0; align-items: flex-start; }
-      .range-picker { padding: 5px 6px; gap: 4px; flex-wrap: wrap; }
-      .range-date   { font-size: 15px; padding: 8px 12px; }
-      .range-label  { flex: 1 1 100%; }
-      .range-arrow  { font-size: 14px; }
-
-      .unscheduled { padding: 16px; margin-top: 36px; }
-      .unscheduled-title { font-size: 12px; margin-bottom: 10px; }
+      .unscheduled { padding: 14px; margin-top: 22px; }
+      .unscheduled-title { font-size: 11px; margin-bottom: 8px; }
 
       /* Loader */
       .loader-text { font-size: 14px; padding: 0 24px; text-align: center; }
       .loader-sub  { font-size: 12px; padding: 0 24px; text-align: center; }
 
       /* Save confirm */
-      .save-confirm-box { width: 110px; height: 110px; }
-      .save-confirm-box svg { width: 54px; height: 54px; }
+      .save-confirm-box { width: 100px; height: 100px; }
+      .save-confirm-box svg { width: 48px; height: 48px; }
 
       /* Unsaved strip */
-      .unsaved-strip { padding: 8px 16px; font-size: 12px; gap: 8px; }
+      .unsaved-strip { padding: 7px 14px; font-size: 12px; gap: 7px; }
     }
 
     @media (max-width: 400px) {
-      .stage { padding: 18px 12px 120px; }
-      .days::before { left: 14px; }
-      .day-header { padding: 12px 12px 12px 44px; }
-      .day-dot { left: 4px; width: 20px; height: 20px; }
-      .day-title { font-size: 18px; }
-      .day-cards { padding-left: 22px; }
-      .day-adds, .day-adds-label { margin-left: 22px; }
-      .brand-title { font-size: 23px; }
-      .card-head   { padding: 10px 12px; gap: 6px; }
-      .card-body   { padding: 12px; gap: 12px; }
-      .type-pill   { font-size: 10px; padding: 3px 8px; letter-spacing: .1em; }
-      .drag-handle { width: 30px; height: 30px; }
-      .inp-copy    { width: 30px; height: 30px; }
-      .btn-tiny    { padding: 6px 8px; }
+      .stage { padding: 12px 12px 100px; }
+      .days::before { left: 12px; }
+      .day-header { padding: 10px 10px 10px 38px; }
+      .day-dot { left: 2px; width: 20px; height: 20px; }
+      .day-title { font-size: 16px; }
+      .day-cards { padding-left: 18px; }
+      .day-adds, .day-adds-label { margin-left: 18px; }
+      .brand-title { font-size: 20px; }
+      .card-head   { padding: 9px 11px; gap: 6px; }
+      .card-body   { padding: 11px; gap: 11px; }
+      .type-pill   { font-size: 9px; padding: 3px 7px; letter-spacing: .08em; }
     }
   </style>
 </head>
