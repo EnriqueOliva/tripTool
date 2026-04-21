@@ -805,7 +805,7 @@
     <div class="toolbar">
       <span class="status" id="statusDot"></span>
       <button class="btn btn-ghost" id="undoBtn" onclick="undo()" disabled>↩ Undo</button>
-      <button class="btn btn-dark"  onclick="saveToSheets()">Save now</button>
+      <button class="btn btn-dark"  onclick="syncNow()">Sync now</button>
     </div>
   </div>
   <div class="unsaved-strip" id="unsavedStrip">
@@ -856,10 +856,11 @@
   // ── Config ───────────────────────────────────────────────────
   const LS           = 'tp_state_v3';
   const FIREBASE_URL = 'https://triptool-64f1f-default-rtdb.firebaseio.com';
-  const DATA_PATH    = '/trip.json';
-  const REMOTE_URL   = FIREBASE_URL + DATA_PATH;
-  const SAVE_DEBOUNCE_MS  = 10000;
-  const LOAD_SLOW_HINT_MS = 2500;
+  const TRIP_URL     = FIREBASE_URL + '/trip';
+  const TYPING_DEBOUNCE_MS = 700;   // per-field debounce when typing in metas
+  const SUPPRESS_REMOTE_MS = 1500;  // ignore listener echoes of our own writes briefly
+  const LOAD_SLOW_HINT_MS  = 2500;
+  const SERVER_TS    = { '.sv': 'timestamp' }; // Firebase server-side timestamp marker
 
   const MODES = {
     flight: { icon: '✈️', label: 'Flight' },
@@ -883,27 +884,37 @@
     description: '',
     startDate: '',
     endDate: '',
-    cards: [],
+    metaUpdatedAt: 0,
+    cards: [],          // displayed in this order; mirrors cardOrder
+    cardOrder: [],
   };
   let history   = [];
-  let saveTimer = null;
-  let dirty     = false;
-  let saving    = false;
   let io        = null;
+
+  // ── Sync state ───────────────────────────────────────────────
+  let pendingWrites    = new Map();  // path -> { value, timer }
+  let inflightWrites   = 0;
+  let lastLocalWriteAt = 0;          // suppress listener echo of our own writes briefly
+  let eventSource      = null;
+  let listenerOnline   = false;
+  let mergeTimer       = null;
+  let firstSnapshotApplied = false;
+  let suppressedFocus  = null;       // { fkey, start, end }
 
   // ── Boot ─────────────────────────────────────────────────────
   function init() {
-    document.getElementById('tripTitle').addEventListener('input', e => {
-      state.title = e.target.value;
-      scheduleSave();
+    const titleInp = document.getElementById('tripTitle');
+    titleInp.setAttribute('data-fkey', 'meta-title');
+    titleInp.addEventListener('input', e => {
+      writeMeta('title', e.target.value);
       updateMeta();
     });
 
     const desc = document.getElementById('tripDescription');
+    desc.setAttribute('data-fkey', 'meta-description');
     desc.addEventListener('input', e => {
-      state.description = e.target.value;
+      writeMeta('description', e.target.value);
       autoResize(desc);
-      scheduleSave();
     });
 
     // Belt-and-braces: re-size once all resources (fonts incl.) are loaded
@@ -916,7 +927,9 @@
     });
 
     window.addEventListener('beforeunload', e => {
-      if (dirty || saving) { e.preventDefault(); e.returnValue = ''; }
+      // Push out anything still waiting on the typing-debounce timer
+      flushAllPendingWrites();
+      if (!isQuiet()) { e.preventDefault(); e.returnValue = ''; }
     });
 
     io = new IntersectionObserver(entries => {
@@ -955,8 +968,10 @@
 
   // Auto-growing text field. rows=1 for single-line fields, rows=2 for notes.
   function taText(cardId, key, value, placeholder, rows = 1, maxLen = 300) {
+    const fkey = 'card-' + cardId + '-' + key;
     return `<div class="ta-wrap">
       <textarea class="inp notes-auto" rows="${rows}" maxlength="${maxLen}"
+                data-fkey="${fkey}"
                 placeholder="${x(placeholder)}"
                 oninput="autoResize(this)"
                 onchange="upd('${cardId}','${key}',this.value)">${x(value)}</textarea>
@@ -995,12 +1010,15 @@
   function migrate(data) {
     // Already new format
     if (data && Array.isArray(data.cards)) {
+      const cards = data.cards.map(normalizeCard);
       return {
-        title:       data.title       || 'Our Trip',
-        description: data.description || '',
-        startDate:   data.startDate   || '',
-        endDate:     data.endDate     || '',
-        cards:       data.cards.map(normalizeCard),
+        title:         data.title         || 'Our Trip',
+        description:   data.description   || '',
+        startDate:     data.startDate     || '',
+        endDate:       data.endDate       || '',
+        metaUpdatedAt: data.metaUpdatedAt || 0,
+        cards,
+        cardOrder:     Array.isArray(data.cardOrder) ? data.cardOrder : cards.map(c => c.id),
       };
     }
     // Old format: { items: [{...}] } or just [{...}]
@@ -1033,11 +1051,13 @@
     });
     const dates = cards.map(c => c.date).filter(Boolean).sort();
     return {
-      title:       data?.title       || 'Our Trip',
-      description: data?.description || '',
-      startDate:   dates[0] || '',
-      endDate:     dates[dates.length - 1] || '',
+      title:         data?.title       || 'Our Trip',
+      description:   data?.description || '',
+      startDate:     dates[0] || '',
+      endDate:       dates[dates.length - 1] || '',
+      metaUpdatedAt: 0,
       cards,
+      cardOrder:     cards.map(c => c.id),
     };
   }
 
@@ -1048,6 +1068,7 @@
       date:   c.date || '',
       status: c.status || 'idea',
       notes:  c.notes  || '',
+      updatedAt: c.updatedAt || 0,
     };
     if (base.type === 'activity') {
       const out = { ...base, location: c.location || '', activity: c.activity || '' };
@@ -1094,78 +1115,358 @@
   }
 
   // ── Remote (Firebase Realtime Database) ──────────────────────
+  // Storage shape:
+  //   /trip
+  //     /title             (string)
+  //     /description       (string)
+  //     /startDate         (string)
+  //     /endDate           (string)
+  //     /metaUpdatedAt     (server timestamp, ms)
+  //     /cards/{cardId}    ({...fields, updatedAt: server timestamp})
+  //     /cardOrder         (array of card ids in display order)
+
+  async function fbReq(method, path, body) {
+    const opts = { method };
+    if (body !== undefined) {
+      opts.headers = { 'Content-Type': 'application/json' };
+      opts.body    = JSON.stringify(body);
+    }
+    // ?print=silent skips the echo body for PUTs (faster)
+    const url = TRIP_URL + path + '.json' + (method === 'PUT' ? '?print=silent' : '');
+    const res = await fetch(url, opts);
+    if (!res.ok) throw new Error('HTTP ' + res.status + ' on ' + method + ' ' + path);
+    if (method === 'PUT' || method === 'DELETE') return null;
+    return res.json();
+  }
+  const fbGet    = (path = '') => fbReq('GET',    path);
+  const fbPut    = (path, val) => fbReq('PUT',    path, val);
+  const fbPatch  = (path, val) => fbReq('PATCH',  path, val);
+  const fbDelete = (path)      => fbReq('DELETE', path);
+
+  // ── Granular write queue (typing-debounced) ──────────────────
+  function schedulePathWrite(path, value, immediate = false) {
+    if (immediate) { flushPathWrite(path, value); return; }
+    const existing = pendingWrites.get(path);
+    if (existing) clearTimeout(existing.timer);
+    const timer = setTimeout(() => flushPathWrite(path, value), TYPING_DEBOUNCE_MS);
+    pendingWrites.set(path, { value, timer });
+    setSync('dirty');
+  }
+
+  async function flushPathWrite(path, value) {
+    pendingWrites.delete(path);
+    inflightWrites++;
+    setSync('saving');
+    lastLocalWriteAt = Date.now();
+    try {
+      await fbPut(path, value);
+    } catch (e) {
+      console.error('write failed', path, e);
+      setSync('err');
+      // Re-queue with backoff
+      setTimeout(() => schedulePathWrite(path, value, true), 2500);
+      return;
+    } finally {
+      inflightWrites--;
+    }
+    if (inflightWrites === 0 && pendingWrites.size === 0) {
+      setSync('saved');
+      flashSaveConfirm();
+      setTimeout(() => { if (isQuiet()) setSync('idle'); }, 1800);
+    }
+  }
+
+  function flushAllPendingWrites() {
+    const entries = [...pendingWrites.entries()];
+    pendingWrites.clear();
+    entries.forEach(([path, { timer, value }]) => {
+      clearTimeout(timer);
+      flushPathWrite(path, value);
+    });
+  }
+  function isQuiet() { return inflightWrites === 0 && pendingWrites.size === 0; }
+
+  // ── Business-logic writes (used by mutation funcs) ───────────
+  function writeMeta(field, value) {
+    state[field] = value;
+    state.metaUpdatedAt = Date.now();
+    schedulePathWrite('/' + field, value);
+    schedulePathWrite('/metaUpdatedAt', SERVER_TS);
+    saveLocal();
+  }
+
+  function writeCardField(id, field, value) {
+    const idx = state.cards.findIndex(c => c.id === id);
+    if (idx < 0) return;
+    state.cards[idx] = { ...state.cards[idx], [field]: value, updatedAt: Date.now() };
+    schedulePathWrite('/cards/' + id + '/' + field, value, true);
+    schedulePathWrite('/cards/' + id + '/updatedAt', SERVER_TS, true);
+    saveLocal();
+  }
+
+  function writeCardDeleteField(id, field) {
+    const idx = state.cards.findIndex(c => c.id === id);
+    if (idx < 0) return;
+    const copy = { ...state.cards[idx] };
+    delete copy[field];
+    copy.updatedAt = Date.now();
+    state.cards[idx] = copy;
+    schedulePathWrite('/cards/' + id + '/' + field, null, true);
+    schedulePathWrite('/cards/' + id + '/updatedAt', SERVER_TS, true);
+    saveLocal();
+  }
+
+  function writeNewCard(card) {
+    state.cards.push(card);
+    state.cardOrder = state.cards.map(c => c.id);
+    const payload = { ...card, updatedAt: SERVER_TS };
+    schedulePathWrite('/cards/' + card.id, payload, true);
+    schedulePathWrite('/cardOrder', state.cardOrder, true);
+    saveLocal();
+  }
+
+  function writeRemoveCard(id) {
+    state.cards    = state.cards.filter(c => c.id !== id);
+    state.cardOrder = state.cards.map(c => c.id);
+    schedulePathWrite('/cards/' + id, null, true);
+    schedulePathWrite('/cardOrder', state.cardOrder, true);
+    saveLocal();
+  }
+
+  function writeReorder() {
+    state.cardOrder = state.cards.map(c => c.id);
+    schedulePathWrite('/cardOrder', state.cardOrder, true);
+    saveLocal();
+  }
+
+  // ── Initial load (with migration) ────────────────────────────
   async function load() {
-    setState('saving'); setStatusText('↓ loading…');
+    setSync('saving'); setStatusText('↓ loading…');
     const slowHint = setTimeout(() => {
       document.getElementById('loaderSub')?.classList.add('show');
     }, LOAD_SLOW_HINT_MS);
 
     try {
-      const res  = await fetch(REMOTE_URL);
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
-      state = migrate(data || {});
+      const remote = await fbGet();
+      if (!remote) {
+        // Empty database — write initial empty state.
+        await fbPut('', { ...emptyRemote(), metaUpdatedAt: SERVER_TS });
+      } else if (Array.isArray(remote.cards)) {
+        // Old shape ({cards: [...]}) — migrate to map shape, write back.
+        await migrateOldShape(remote);
+      }
+      const fresh = await fbGet();
+      state = remoteToLocal(fresh || emptyRemote());
       history = [];
       document.getElementById('undoBtn').disabled = true;
-      dirty = false;
       render();
-      setState('idle');
+      setSync('synced');
     } catch (e) {
       console.error(e);
       loadLocal();
-      setState('err');
+      setSync('err');
       toast('Could not reach server — showing local data', 'bad');
     } finally {
       clearTimeout(slowHint);
       hideLoader();
     }
+    startListener();
   }
 
-  function scheduleSave() {
-    dirty = true;
-    setState('dirty');
-    clearTimeout(saveTimer);
-    saveTimer = setTimeout(doSave, SAVE_DEBOUNCE_MS);
+  function emptyRemote() {
+    return { title: 'Our Trip', description: '', startDate: '', endDate: '',
+             metaUpdatedAt: 0, cards: {}, cardOrder: [] };
   }
 
-  async function doSave() {
-    clearTimeout(saveTimer);
-    if (saving) return;
-    if (!dirty) { setState('saved'); return; }
-    saving = true; dirty = false;
-    const snapshot = JSON.stringify(state);
-    setState('saving');
+  function remoteToLocal(remote) {
+    const cardsMap = remote.cards || {};
+    let order = Array.isArray(remote.cardOrder) ? remote.cardOrder.slice() : [];
+    // Ensure every cardsMap key appears exactly once in order
+    const seen = new Set();
+    order = order.filter(id => cardsMap[id] && !seen.has(id) && (seen.add(id) || true));
+    Object.keys(cardsMap).forEach(id => { if (!seen.has(id)) { order.push(id); seen.add(id); } });
+    const cards = order.map(id => normalizeCard({ ...cardsMap[id], id }));
+    return {
+      title:         remote.title         || 'Our Trip',
+      description:   remote.description   || '',
+      startDate:     remote.startDate     || '',
+      endDate:       remote.endDate       || '',
+      metaUpdatedAt: remote.metaUpdatedAt || 0,
+      cards,
+      cardOrder:     order,
+    };
+  }
+
+  async function migrateOldShape(old) {
+    const cardsMap = {};
+    const order = [];
+    (old.cards || []).forEach(c => {
+      if (!c || !c.id) return;
+      cardsMap[c.id] = { ...c, updatedAt: SERVER_TS };
+      order.push(c.id);
+    });
+    const newShape = {
+      title:         old.title       || 'Our Trip',
+      description:   old.description || '',
+      startDate:     old.startDate   || '',
+      endDate:       old.endDate     || '',
+      metaUpdatedAt: SERVER_TS,
+      cards:         cardsMap,
+      cardOrder:     order,
+    };
+    await fbPut('', newShape);
+  }
+
+  // ── Live listener (Server-Sent Events) ───────────────────────
+  function startListener() {
+    if (eventSource) eventSource.close();
+    eventSource = new EventSource(TRIP_URL + '.json');
+
+    eventSource.addEventListener('put',   onSseChange);
+    eventSource.addEventListener('patch', onSseChange);
+    eventSource.addEventListener('keep-alive', () => { listenerOnline = true; });
+    eventSource.addEventListener('cancel',        () => setTimeout(startListener, 1500));
+    eventSource.addEventListener('auth_revoked',  () => setTimeout(startListener, 1500));
+
+    eventSource.onopen  = () => { listenerOnline = true; firstSnapshotApplied = true; };
+    eventSource.onerror = () => { listenerOnline = false; /* EventSource auto-reconnects */ };
+
+    document.removeEventListener('visibilitychange', onVisibility);
+    document.addEventListener('visibilitychange', onVisibility);
+  }
+
+  function onVisibility() {
+    if (document.visibilityState !== 'visible') return;
+    if (!eventSource || eventSource.readyState !== EventSource.OPEN) startListener();
+    refetchAndMerge();
+  }
+
+  function onSseChange() {
+    // Skip echoes of our own very recent writes (avoids cursor jitter while typing).
+    if (Date.now() - lastLocalWriteAt < SUPPRESS_REMOTE_MS) {
+      // But still schedule a re-merge after the suppression window so we don't miss anything.
+      clearTimeout(mergeTimer);
+      mergeTimer = setTimeout(refetchAndMerge, SUPPRESS_REMOTE_MS);
+      return;
+    }
+    clearTimeout(mergeTimer);
+    mergeTimer = setTimeout(refetchAndMerge, 120);
+  }
+
+  async function refetchAndMerge() {
     try {
-      const res = await fetch(REMOTE_URL, {
-        method:  'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body:    snapshot,
-      });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      await res.json();
-      saving = false;
-      if (dirty) scheduleSave();
-      else {
-        setState('saved');
-        flashSaveConfirm();
-        setTimeout(() => { if (!dirty && !saving) setState('idle'); }, 3000);
-      }
+      const remote = await fbGet();
+      mergeRemoteIntoLocal(remoteToLocal(remote || emptyRemote()));
     } catch (e) {
-      console.error('save failed:', e);
-      saving = false; dirty = true;
-      setState('err');
-      saveTimer = setTimeout(doSave, SAVE_DEBOUNCE_MS);
-      toast('Save failed — will retry', 'bad');
+      console.error('refetch failed', e);
     }
   }
 
-  function saveToSheets() { dirty = true; clearTimeout(saveTimer); doSave(); }
+  function mergeRemoteIntoLocal(remote) {
+    // Capture focus/selection BEFORE any DOM mutation so we can restore it.
+    const focused    = document.activeElement;
+    const focusKey   = focused?.getAttribute?.('data-fkey') || null;
+    const focusStart = focused?.selectionStart;
+    const focusEnd   = focused?.selectionEnd;
+    const focusValue = (focusKey && 'value' in focused) ? focused.value : null;
 
-  function setState(s) {
+    // If user has typed something into the focused field but hasn't committed
+    // it yet (no blur or no debounce flush), capture the DOM value into local
+    // state so the re-render preserves it.
+    if (focusKey && focusValue !== null) {
+      if (focusKey.startsWith('meta-')) {
+        const k = focusKey.slice(5);
+        if (state[k] !== focusValue) state[k] = focusValue;
+      } else if (focusKey.startsWith('card-')) {
+        // Format: card-{id}-{field}.  Card ids are date.toString(36)+random,
+        // never contain a '-', so the first segment after "card-" is the id.
+        const rest = focusKey.slice(5);
+        const dash = rest.indexOf('-');
+        const id    = rest.slice(0, dash);
+        const field = rest.slice(dash + 1);
+        const idx = state.cards.findIndex(c => c.id === id);
+        if (idx >= 0 && state.cards[idx][field] !== focusValue) {
+          state.cards[idx] = { ...state.cards[idx], [field]: focusValue, updatedAt: Date.now() };
+        }
+      }
+    }
+
+    let changed = false;
+
+    // ── Meta: take remote if its metaUpdatedAt is newer ──
+    if ((remote.metaUpdatedAt || 0) > (state.metaUpdatedAt || 0)) {
+      ['title', 'description', 'startDate', 'endDate'].forEach(k => {
+        if (focusKey === 'meta-' + k) return;        // user is typing here, leave alone
+        if (state[k] !== remote[k]) { state[k] = remote[k]; changed = true; }
+      });
+      state.metaUpdatedAt = remote.metaUpdatedAt;
+    }
+
+    // ── Cards: per-id merge by updatedAt, ordered by remote.cardOrder ──
+    const localById  = Object.fromEntries(state.cards.map(c => [c.id, c]));
+    const remoteById = Object.fromEntries(remote.cards.map(c => [c.id, c]));
+    const remoteIds  = remote.cards.map(c => c.id);
+
+    const newCards = remoteIds.map(id => {
+      const r = remoteById[id], l = localById[id];
+      if (!l) return r;
+      if ((r.updatedAt || 0) > (l.updatedAt || 0)) {
+        // Remote is newer. Preserve any field the user is currently typing in.
+        const merged = { ...r };
+        Object.keys({ ...l, ...r }).forEach(f => {
+          if (focusKey === 'card-' + id + '-' + f) merged[f] = l[f];
+        });
+        return merged;
+      }
+      return l;
+    });
+
+    // Local cards not in remote: was it locally just added (recent write not yet round-tripped),
+    // or was it deleted remotely?
+    state.cards.forEach(c => {
+      if (remoteById[c.id]) return;
+      const veryRecent = (Date.now() - (c.updatedAt || 0)) < SUPPRESS_REMOTE_MS;
+      if (veryRecent || pendingWrites.has('/cards/' + c.id) || pendingWrites.has('/cards/' + c.id + '/updatedAt')) {
+        newCards.push(c);   // local-only addition still propagating, keep it
+      }
+      // Else: deleted remotely — drop.
+    });
+
+    if (JSON.stringify(state.cards) !== JSON.stringify(newCards)) changed = true;
+    state.cards     = newCards;
+    state.cardOrder = newCards.map(c => c.id);
+
+    if (!changed) {
+      setSync(isQuiet() ? 'idle' : 'saving');
+      return;
+    }
+
+    suppressedFocus = focusKey ? { fkey: focusKey, start: focusStart, end: focusEnd } : null;
+    render();
+    suppressedFocus = null;
+    setSync(isQuiet() ? 'idle' : 'saving');
+  }
+
+  function restoreFocus() {
+    if (!suppressedFocus) return;
+    const { fkey, start, end } = suppressedFocus;
+    const el = document.querySelector('[data-fkey="' + cssEscape(fkey) + '"]');
+    if (!el) return;
+    el.focus();
+    if (start != null && end != null && el.setSelectionRange) {
+      try { el.setSelectionRange(start, end); } catch {}
+    }
+  }
+  function cssEscape(s) {
+    return (window.CSS && CSS.escape) ? CSS.escape(s) : s.replace(/(["\\])/g, '\\$1');
+  }
+
+  // ── Sync status indicator ────────────────────────────────────
+  function setSync(s) {
     setStatusClass(s);
     setStatusText(stateLabel(s));
     updateUnsavedStrip(s);
-    updateTitle();
+    updateTitle(s);
   }
   function updateUnsavedStrip(s) {
     const el   = document.getElementById('unsavedStrip');
@@ -1173,13 +1474,13 @@
     if (!el) return;
     el.classList.remove('show', 'err');
     document.body.classList.toggle('is-dirty', s === 'dirty' || s === 'saving' || s === 'err');
-    if (s === 'dirty')  { el.classList.add('show'); text.textContent = 'Unsaved changes'; }
-    else if (s === 'saving') { el.classList.add('show'); text.textContent = 'Saving…'; }
-    else if (s === 'err')    { el.classList.add('show', 'err'); text.textContent = 'Save failed — will retry'; }
+    if (s === 'dirty')        { el.classList.add('show');       text.textContent = 'Unsaved changes'; }
+    else if (s === 'saving')  { el.classList.add('show');       text.textContent = 'Syncing…'; }
+    else if (s === 'err')     { el.classList.add('show', 'err'); text.textContent = 'Sync failed — retrying'; }
   }
-  function updateTitle() {
+  function updateTitle(s) {
     const base = state.title || 'Our Trip';
-    document.title = (dirty || saving) ? `• ${base}` : base;
+    document.title = (s === 'dirty' || s === 'saving') ? '• ' + base : base;
   }
   function flashSaveConfirm() {
     const el = document.getElementById('saveConfirm');
@@ -1189,18 +1490,29 @@
     el.classList.add('on');
   }
   function stateLabel(s) {
-    return s === 'idle' ? '' : s === 'dirty' ? '· unsaved' :
-           s === 'saving' ? '↑ saving…' : s === 'saved' ? '✓ saved' :
-           s === 'err' ? '⚠ retrying' : '';
+    return s === 'idle'   ? ''           :
+           s === 'dirty'  ? '· unsaved'  :
+           s === 'saving' ? '↑ syncing…' :
+           s === 'saved'  ? '✓ synced'   :
+           s === 'synced' ? '● live'     :
+           s === 'err'    ? '⚠ retrying' : '';
   }
   function setStatusClass(s) {
     const el = document.getElementById('statusDot');
-    el.className = 'status' + (s === 'idle' ? '' :
-                               s === 'dirty' || s === 'saving' ? ' saving' :
-                               s === 'saved' ? ' saved' :
-                               s === 'err' ? ' err' : '');
+    el.className = 'status' + (
+      s === 'idle'                       ? ''        :
+      s === 'dirty' || s === 'saving'    ? ' saving' :
+      s === 'saved' || s === 'synced'    ? ' saved'  :
+      s === 'err'                        ? ' err'    : '');
   }
   function setStatusText(t) { document.getElementById('statusDot').textContent = t; }
+
+  // Manual "Sync now" — flushes typing-debounced writes and pulls the latest.
+  async function syncNow() {
+    flushAllPendingWrites();
+    await refetchAndMerge();
+    flashSaveConfirm();
+  }
 
   // ── Date helpers ─────────────────────────────────────────────
   function fmtDate(s) {
@@ -1236,12 +1548,11 @@
 
   function setRange(field, value) {
     pushHistory();
-    state[field] = value;
+    writeMeta(field, value);
     if (state.startDate && state.endDate && state.startDate > state.endDate) {
-      if (field === 'startDate') state.endDate = value;
-      else state.startDate = value;
+      writeMeta(field === 'startDate' ? 'endDate' : 'startDate', value);
     }
-    render(); scheduleSave();
+    render();
   }
 
   // ── Render ───────────────────────────────────────────────────
@@ -1278,6 +1589,7 @@
     initSortables();
     resizeNotes();
     saveLocal();
+    restoreFocus();
   }
 
   function resizeNotes() {
@@ -1386,21 +1698,36 @@
     // Snapshot BEFORE applying the change so Undo can restore it
     pushHistory();
 
-    // Rebuild state.cards from the current DOM order across all day-blocks
+    // Rebuild state.cards from the current DOM order across all day-blocks.
+    // For any card whose date changed, we need to write the new date too.
     const newCards = [];
+    const dateChanges = [];
+    const oldById = Object.fromEntries(state.cards.map(c => [c.id, c]));
     document.querySelectorAll('.day-block').forEach(block => {
       const date = block.dataset.date || '';
       block.querySelectorAll('.day-cards .card').forEach(cardEl => {
         const id = cardEl.dataset.cardId;
-        const existing = state.cards.find(c => c.id === id);
-        if (existing) newCards.push({ ...existing, date });
+        const existing = oldById[id];
+        if (!existing) return;
+        if (existing.date !== date) {
+          dateChanges.push({ id, date });
+        }
+        newCards.push({ ...existing, date });
       });
     });
-    state.cards = newCards;
-
+    state.cards     = newCards;
+    state.cardOrder = newCards.map(c => c.id);
     updateMeta();
     saveLocal();
-    scheduleSave();
+
+    // Write the new order, plus any date-changes per card
+    schedulePathWrite('/cardOrder', state.cardOrder, true);
+    dateChanges.forEach(({ id, date }) => {
+      const idx = state.cards.findIndex(c => c.id === id);
+      if (idx >= 0) state.cards[idx].updatedAt = Date.now();
+      schedulePathWrite('/cards/' + id + '/date', date, true);
+      schedulePathWrite('/cards/' + id + '/updatedAt', SERVER_TS, true);
+    });
   }
 
   function renderCard(c) {
@@ -1606,28 +1933,58 @@
     if (!history.length) return;
     state = JSON.parse(history.pop());
     document.getElementById('undoBtn').disabled = history.length === 0;
-    render(); scheduleSave();
+    state.metaUpdatedAt = Date.now();
+    state.cards = state.cards.map(c => ({ ...c, updatedAt: Date.now() }));
+    state.cardOrder = state.cards.map(c => c.id);
+    render();
+    saveLocal();
+    writeFullState();
     toast('Undone', '');
+  }
+
+  // Write entire state at once (used for undo). Goes to /trip path with the
+  // new map+order shape. The merge logic on other clients handles propagation.
+  function writeFullState() {
+    const cardsMap = {};
+    state.cards.forEach(c => { cardsMap[c.id] = { ...c, updatedAt: SERVER_TS }; });
+    const remoteShape = {
+      title:         state.title,
+      description:   state.description,
+      startDate:     state.startDate,
+      endDate:       state.endDate,
+      metaUpdatedAt: SERVER_TS,
+      cards:         cardsMap,
+      cardOrder:     state.cardOrder,
+    };
+    pendingWrites.forEach(({ timer }) => clearTimeout(timer));
+    pendingWrites.clear();
+    inflightWrites++;
+    setSync('saving');
+    lastLocalWriteAt = Date.now();
+    fbPut('', remoteShape).catch(e => {
+      console.error('full-state write failed', e);
+      setSync('err');
+    }).finally(() => {
+      inflightWrites--;
+      if (isQuiet()) setSync('saved');
+    });
   }
 
   // ── Data ops ─────────────────────────────────────────────────
   function upd(id, field, val) {
     pushHistory();
-    state.cards = state.cards.map(c => c.id === id ? { ...c, [field]: val } : c);
-    updateMeta(); saveLocal(); scheduleSave();
+    writeCardField(id, field, val);
+    updateMeta();
   }
   function deleteField(id, field) {
     pushHistory();
-    state.cards = state.cards.map(c => {
-      if (c.id !== id) return c;
-      const copy = { ...c }; delete copy[field]; return copy;
-    });
-    render(); scheduleSave();
+    writeCardDeleteField(id, field);
+    render();
   }
   function addField(id, field, initial = '') {
     pushHistory();
-    state.cards = state.cards.map(c => c.id === id ? { ...c, [field]: initial } : c);
-    render(); scheduleSave();
+    writeCardField(id, field, initial);
+    render();
   }
   function updStatus(id, sel) {
     sel.className = `badge badge-${sel.value}`;
@@ -1635,21 +1992,17 @@
   }
   function addCard(type, date) {
     pushHistory();
-    state.cards.push(blankCard(type, date));
-    render(); scheduleSave();
-    // Scroll the new card into view
+    writeNewCard(blankCard(type, date));
+    render();
     requestAnimationFrame(() => {
-      const cards = document.querySelectorAll(`.day-block`);
-      // find block matching the date
-      // Simpler: find the last card in the day block whose header contains this date
       const all = document.querySelectorAll('.day-block .card');
       if (all.length) all[all.length - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
   }
   function removeCard(id) {
     pushHistory();
-    state.cards = state.cards.filter(c => c.id !== id);
-    render(); scheduleSave();
+    writeRemoveCard(id);
+    render();
   }
 
   // ── Toast ─────────────────────────────────────────────────────
