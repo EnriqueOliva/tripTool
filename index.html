@@ -882,6 +882,9 @@
       scheduleSave();
     });
 
+    // Belt-and-braces: re-size once all resources (fonts incl.) are loaded
+    window.addEventListener('load', () => resizeDesc());
+
     document.addEventListener('keydown', e => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
     });
@@ -900,8 +903,20 @@
   function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 5); }
 
   function autoResize(el) {
-    el.style.height = 'auto';
+    if (!el) return;
+    el.style.height = '0';
     el.style.height = el.scrollHeight + 'px';
+  }
+
+  // Resize the trip description textarea — run multiple times to handle
+  // the case where fonts haven't loaded yet and scrollHeight is wrong.
+  function resizeDesc() {
+    const desc = document.getElementById('tripDescription');
+    if (!desc) return;
+    autoResize(desc);
+    requestAnimationFrame(() => autoResize(desc));
+    if (document.fonts?.ready) document.fonts.ready.then(() => autoResize(desc));
+    setTimeout(() => autoResize(desc), 300);
   }
 
   const ICON_COPY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>';
@@ -1194,9 +1209,7 @@
     document.getElementById('tripTitle').value = state.title;
     const desc = document.getElementById('tripDescription');
     desc.value = state.description || '';
-    autoResize(desc);
-    // Re-measure after fonts load (initial measure can be wrong with fallback fonts)
-    if (document.fonts?.ready) document.fonts.ready.then(() => autoResize(desc));
+    resizeDesc();
     renderRangePickers();
     updateMeta();
 
