@@ -1242,7 +1242,15 @@
 
     document.querySelectorAll('.day-block').forEach(el => io.observe(el));
     initSortables();
+    resizeNotes();
     saveLocal();
+  }
+
+  function resizeNotes() {
+    const nodes = document.querySelectorAll('textarea.notes-auto');
+    nodes.forEach(autoResize);
+    requestAnimationFrame(() => nodes.forEach(autoResize));
+    if (document.fonts?.ready) document.fonts.ready.then(() => nodes.forEach(autoResize));
   }
 
   function renderRangePickers() {
@@ -1431,8 +1439,9 @@
         <div class="field span2">
           <label class="label">Notes</label>
           <div class="ta-wrap">
-            <textarea class="inp" rows="2"
+            <textarea class="inp notes-auto" rows="2"
                       placeholder="Links, reservations, things to remember…"
+                      oninput="autoResize(this)"
                       onchange="upd('${c.id}','notes',this.value)">${x(c.notes)}</textarea>
             ${copyBtn()}
           </div>
@@ -1492,8 +1501,9 @@
         <div class="field span2">
           <label class="label">Notes</label>
           <div class="ta-wrap">
-            <textarea class="inp" rows="2"
+            <textarea class="inp notes-auto" rows="2"
                       placeholder="Seat, terminal, baggage, links…"
+                      oninput="autoResize(this)"
                       onchange="upd('${c.id}','notes',this.value)">${x(c.notes)}</textarea>
             ${copyBtn()}
           </div>
@@ -1566,8 +1576,9 @@
         <div class="field span2">
           <label class="label">Notes</label>
           <div class="ta-wrap">
-            <textarea class="inp" rows="2"
+            <textarea class="inp notes-auto" rows="2"
                       placeholder="Room preferences, breakfast, Wi-Fi…"
+                      oninput="autoResize(this)"
                       onchange="upd('${c.id}','notes',this.value)">${x(c.notes)}</textarea>
             ${copyBtn()}
           </div>
