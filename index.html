@@ -392,6 +392,19 @@
       text-transform: uppercase; letter-spacing: .11em;
       color: var(--text-3);
     }
+    .label-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .label-remove {
+      flex-shrink: 0;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-3);
+      font-size: 14px; line-height: 1;
+      cursor: pointer;
+      transition: color .15s, border-color .15s, background .15s;
+    }
+    .label-remove:hover { color: #fff; border-color: var(--danger, #f87171); background: rgba(248,113,113,.15); }
     .inp {
       font: 400 17px/1.5 'Inter', sans-serif;
       color: var(--text);
@@ -465,7 +478,12 @@
     .card.type-transport .inp:focus { border-bottom-color: var(--transport); }
     .card.type-hotel     .inp:focus { border-bottom-color: var(--hotel); }
     .inp::placeholder { color: var(--text-3); }
-    textarea.inp { resize: none; min-height: 44px; line-height: 1.55; font-family: inherit; }
+    textarea.inp {
+      resize: none; min-height: 30px;
+      line-height: 1.55; font-family: inherit;
+      overflow-wrap: anywhere; word-break: break-word;
+    }
+    textarea.notes-auto { overflow: hidden; }
 
     /* ───────── Copy button ───────── */
     .inp-copy {
@@ -779,7 +797,7 @@
 <header class="topbar">
   <div class="topbar-inner">
     <div class="brand">
-      <input class="brand-title" id="tripTitle" type="text" value="Our Trip" spellcheck="false" />
+      <input class="brand-title" id="tripTitle" type="text" value="Our Trip" spellcheck="false" maxlength="120" />
       <span class="brand-meta" id="tripMeta"></span>
     </div>
     <div class="toolbar">
@@ -824,7 +842,7 @@
 </div>
 
 <main class="stage">
-  <textarea class="trip-description" id="tripDescription" rows="1"
+  <textarea class="trip-description" id="tripDescription" rows="1" maxlength="4000"
             placeholder="Write an intro for this trip — who, where, why, anything you want to remember…"></textarea>
 
   <div class="days" id="days"></div>
@@ -887,9 +905,9 @@
     });
 
     // Belt-and-braces: re-size once all resources (fonts incl.) are loaded
-    window.addEventListener('load', () => resizeDesc());
+    window.addEventListener('load', () => { resizeDesc(); resizeNotes(); });
     // Re-measure on viewport changes (rotation, window resize)
-    window.addEventListener('resize', () => resizeDesc());
+    window.addEventListener('resize', () => { resizeDesc(); resizeNotes(); });
 
     document.addEventListener('keydown', e => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
@@ -933,6 +951,17 @@
     return `<button type="button" class="inp-copy" title="Copy" onclick="doCopy(this)">${ICON_COPY}</button>`;
   }
 
+  // Auto-growing text field. rows=1 for single-line fields, rows=2 for notes.
+  function taText(cardId, key, value, placeholder, rows = 1, maxLen = 300) {
+    return `<div class="ta-wrap">
+      <textarea class="inp notes-auto" rows="${rows}" maxlength="${maxLen}"
+                placeholder="${x(placeholder)}"
+                oninput="autoResize(this)"
+                onchange="upd('${cardId}','${key}',this.value)">${x(value)}</textarea>
+      ${copyBtn()}
+    </div>`;
+  }
+
   async function doCopy(btn) {
     const field = btn.parentElement?.querySelector('.inp');
     const text  = field?.value || '';
@@ -955,7 +984,7 @@
   function blankCard(type, date = '') {
     const base = { id: uid(), type, date, status: 'idea', notes: '' };
     if (type === 'activity')  return { ...base, location: '', activity: '' };
-    if (type === 'transport') return { ...base, mode: 'flight', from: '', to: '', departTime: '', arriveTime: '', confirmation: '', confirmation2: '' };
+    if (type === 'transport') return { ...base, mode: 'flight', from: '', to: '', departTime: '', arriveTime: '', confirmation: '' };
     if (type === 'hotel')     return { ...base, name: '', address: '', checkInDate: '', checkInTime: '', checkOutDate: '', checkOutTime: '', confirmation: '' };
     return base;
   }
@@ -1023,14 +1052,17 @@
       if (c.time !== undefined && c.time !== null) out.time = c.time;
       return out;
     }
-    if (base.type === 'transport') return {
-      ...base,
-      mode: c.mode || 'flight',
-      from: c.from || '', to: c.to || '',
-      departTime: c.departTime || '', arriveTime: c.arriveTime || '',
-      confirmation:  c.confirmation  || '',
-      confirmation2: c.confirmation2 || '',
-    };
+    if (base.type === 'transport') {
+      const out = {
+        ...base,
+        mode: c.mode || 'flight',
+        from: c.from || '', to: c.to || '',
+        departTime: c.departTime || '', arriveTime: c.arriveTime || '',
+      };
+      if (c.confirmation  !== undefined) out.confirmation  = c.confirmation  || '';
+      if (c.confirmation2 !== undefined) out.confirmation2 = c.confirmation2 || '';
+      return out;
+    }
     if (base.type === 'hotel') return {
       ...base,
       name: c.name || '', address: c.address || '',
@@ -1406,12 +1438,7 @@
       <div class="card-body">
         <div class="field">
           <label class="label">Location</label>
-          <div class="inp-row">
-            <input class="inp" type="text" value="${x(c.location)}"
-                   placeholder="e.g. Paris"
-                   onchange="upd('${c.id}','location',this.value)" />
-            ${copyBtn()}
-          </div>
+          ${taText(c.id,'location',c.location,'e.g. Paris')}
         </div>
         ${c.time === undefined || c.time === null ? `
           <div class="field">
@@ -1429,22 +1456,11 @@
         `}
         <div class="field span2">
           <label class="label">Activity</label>
-          <div class="inp-row">
-            <input class="inp" type="text" value="${x(c.activity)}"
-                   placeholder="What are you doing?"
-                   onchange="upd('${c.id}','activity',this.value)" />
-            ${copyBtn()}
-          </div>
+          ${taText(c.id,'activity',c.activity,'What are you doing?')}
         </div>
         <div class="field span2">
           <label class="label">Notes</label>
-          <div class="ta-wrap">
-            <textarea class="inp notes-auto" rows="2"
-                      placeholder="Links, reservations, things to remember…"
-                      oninput="autoResize(this)"
-                      onchange="upd('${c.id}','notes',this.value)">${x(c.notes)}</textarea>
-            ${copyBtn()}
-          </div>
+          ${taText(c.id,'notes',c.notes,'Links, reservations, things to remember…',2,2000)}
         </div>
       </div>`;
   }
@@ -1454,21 +1470,11 @@
       <div class="card-body">
         <div class="field">
           <label class="label">From</label>
-          <div class="inp-row">
-            <input class="inp" type="text" value="${x(c.from)}"
-                   placeholder="e.g. Montevideo (MVD)"
-                   onchange="upd('${c.id}','from',this.value)" />
-            ${copyBtn()}
-          </div>
+          ${taText(c.id,'from',c.from,'e.g. Montevideo (MVD)')}
         </div>
         <div class="field">
           <label class="label">To</label>
-          <div class="inp-row">
-            <input class="inp" type="text" value="${x(c.to)}"
-                   placeholder="e.g. Paris (CDG)"
-                   onchange="upd('${c.id}','to',this.value)" />
-            ${copyBtn()}
-          </div>
+          ${taText(c.id,'to',c.to,'e.g. Paris (CDG)')}
         </div>
         <div class="field">
           <label class="label">Departure</label>
@@ -1480,35 +1486,46 @@
           <input class="inp" type="time" value="${x(c.arriveTime)}"
                  onchange="upd('${c.id}','arriveTime',this.value)" />
         </div>
-        <div class="field">
-          <label class="label">Reference / confirmation</label>
-          <div class="inp-row">
-            <input class="inp" type="text" value="${x(c.confirmation)}"
-                   placeholder="Your booking code"
-                   onchange="upd('${c.id}','confirmation',this.value)" />
-            ${copyBtn()}
-          </div>
-        </div>
-        <div class="field">
-          <label class="label">Reference / confirmation (partner)</label>
-          <div class="inp-row">
-            <input class="inp" type="text" value="${x(c.confirmation2)}"
-                   placeholder="Partner's booking code"
-                   onchange="upd('${c.id}','confirmation2',this.value)" />
-            ${copyBtn()}
-          </div>
-        </div>
+        ${transportRefs(c)}
         <div class="field span2">
           <label class="label">Notes</label>
-          <div class="ta-wrap">
-            <textarea class="inp notes-auto" rows="2"
-                      placeholder="Seat, terminal, baggage, links…"
-                      oninput="autoResize(this)"
-                      onchange="upd('${c.id}','notes',this.value)">${x(c.notes)}</textarea>
-            ${copyBtn()}
-          </div>
+          ${taText(c.id,'notes',c.notes,'Seat, terminal, baggage, links…',2,2000)}
         </div>
       </div>`;
+  }
+
+  function transportRefs(c) {
+    const has1 = c.confirmation  !== undefined;
+    const has2 = c.confirmation2 !== undefined;
+    let html = '';
+    if (has1) {
+      html += `<div class="field">
+        <div class="label-row">
+          <label class="label">Reference / confirmation</label>
+          <button class="label-remove" title="Remove field"
+                  onclick="deleteField('${c.id}','confirmation')">×</button>
+        </div>
+        ${taText(c.id,'confirmation',c.confirmation,'Your booking code')}
+      </div>`;
+    }
+    if (has2) {
+      html += `<div class="field">
+        <div class="label-row">
+          <label class="label">Reference / confirmation (partner)</label>
+          <button class="label-remove" title="Remove field"
+                  onclick="deleteField('${c.id}','confirmation2')">×</button>
+        </div>
+        ${taText(c.id,'confirmation2',c.confirmation2,"Partner's booking code")}
+      </div>`;
+    }
+    if (!has1 || !has2) {
+      const key   = !has1 ? 'confirmation' : 'confirmation2';
+      const label = !has1 ? 'reference'    : 'partner reference';
+      html += `<div class="field">
+        <button class="inline-add-btn" onclick="addField('${c.id}','${key}','')">＋ Add ${label}</button>
+      </div>`;
+    }
+    return html;
   }
 
   function hotelBody(c) {
@@ -1516,12 +1533,7 @@
       <div class="card-body">
         <div class="field span2">
           <label class="label">Hotel name</label>
-          <div class="inp-row">
-            <input class="inp" type="text" value="${x(c.name)}"
-                   placeholder="e.g. Hotel Eiffel"
-                   onchange="upd('${c.id}','name',this.value)" />
-            ${copyBtn()}
-          </div>
+          ${taText(c.id,'name',c.name,'e.g. Hotel Eiffel')}
         </div>
         <div class="field">
           <label class="label">Check-in date</label>
@@ -1557,31 +1569,15 @@
         </div>
         <div class="field span2">
           <label class="label">Address</label>
-          <div class="inp-row">
-            <input class="inp" type="text" value="${x(c.address)}"
-                   placeholder="e.g. 5 Av. Anatole France, Paris"
-                   onchange="upd('${c.id}','address',this.value)" />
-            ${copyBtn()}
-          </div>
+          ${taText(c.id,'address',c.address,'e.g. 5 Av. Anatole France, Paris')}
         </div>
         <div class="field span2">
           <label class="label">Confirmation</label>
-          <div class="inp-row">
-            <input class="inp" type="text" value="${x(c.confirmation)}"
-                   placeholder="e.g. Booking.com · ABC123"
-                   onchange="upd('${c.id}','confirmation',this.value)" />
-            ${copyBtn()}
-          </div>
+          ${taText(c.id,'confirmation',c.confirmation,'e.g. Booking.com · ABC123')}
         </div>
         <div class="field span2">
           <label class="label">Notes</label>
-          <div class="ta-wrap">
-            <textarea class="inp notes-auto" rows="2"
-                      placeholder="Room preferences, breakfast, Wi-Fi…"
-                      oninput="autoResize(this)"
-                      onchange="upd('${c.id}','notes',this.value)">${x(c.notes)}</textarea>
-            ${copyBtn()}
-          </div>
+          ${taText(c.id,'notes',c.notes,'Room preferences, breakfast, Wi-Fi…',2,2000)}
         </div>
       </div>`;
   }
