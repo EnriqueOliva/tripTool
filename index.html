@@ -887,6 +887,8 @@
 
     // Belt-and-braces: re-size once all resources (fonts incl.) are loaded
     window.addEventListener('load', () => resizeDesc());
+    // Re-measure on viewport changes (rotation, window resize)
+    window.addEventListener('resize', () => resizeDesc());
 
     document.addEventListener('keydown', e => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
