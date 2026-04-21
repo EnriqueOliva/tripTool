@@ -454,6 +454,39 @@
     .inp::placeholder { color: var(--text-3); }
     textarea.inp { resize: none; min-height: 44px; line-height: 1.55; font-family: inherit; }
 
+    /* ───────── Copy button ───────── */
+    .inp-copy {
+      flex-shrink: 0;
+      width: 28px; height: 28px;
+      border-radius: 7px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-3);
+      cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: all .15s var(--ease);
+      padding: 0;
+    }
+    .inp-copy svg { width: 14px; height: 14px; display: block; }
+    .inp-copy:hover { background: var(--surface-2); color: var(--text); border-color: var(--border-2); }
+    .inp-copy.copied { color: var(--book-fg); border-color: var(--book-fg); background: rgba(74,222,128,.08); }
+    /* Hide copy button when the adjacent input is empty */
+    .inp-row .inp:placeholder-shown ~ .inp-copy,
+    .ta-wrap .inp:placeholder-shown ~ .inp-copy { opacity: 0; pointer-events: none; }
+    .inp-copy.copied svg { animation: copy-bounce .35s var(--ease); }
+    @keyframes copy-bounce {
+      0%   { transform: scale(1);  }
+      50%  { transform: scale(1.3); }
+      100% { transform: scale(1);  }
+    }
+
+    /* Textarea wrapper — copy button in top-right corner */
+    .ta-wrap { position: relative; }
+    .ta-wrap .inp-copy {
+      position: absolute; top: 6px; right: 6px;
+      background: var(--surface);
+    }
+
     /* ───────── Big add buttons ───────── */
     .day-adds-label {
       margin-left: 56px;
@@ -627,25 +660,38 @@
     }
 
     @media (max-width: 560px) {
-      .stage { padding: 22px 14px 120px; }
-      .intro { font-size: 18px; margin-bottom: 28px; }
+      .stage { padding: 20px 14px 120px; }
+      .trip-description {
+        font-size: 17px; margin-bottom: 28px;
+        margin-left: 0; padding: 6px 8px;
+      }
 
+      .days { gap: 34px; }
       .days::before { left: 18px; }
-      .day-header { padding: 14px 16px 14px 56px; border-radius: var(--r-lg); }
+      .day-header {
+        padding: 14px 14px 14px 52px;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
       .day-dot { left: 8px; width: 22px; height: 22px; }
-      .day-title { font-size: 22px; }
-      .day-weekday { font-size: 13px; }
+      .day-header-main { min-width: 0; flex: 1; }
+      .day-title { font-size: 20px; letter-spacing: -0.01em; line-height: 1.25; }
+      .day-weekday { font-size: 13px; display: block; margin: 0 0 2px 0; }
       .day-num { font-size: 11px; letter-spacing: .16em; }
-      .day-count { font-size: 12px; padding: 4px 10px; }
+      .day-count { font-size: 12px; padding: 4px 10px; flex-shrink: 0; }
 
       .day-cards { padding: 12px 0 12px 28px; gap: 10px; }
-      .day-adds-label { margin-left: 28px; font-size: 11px; }
+      .day-adds-label { margin-left: 28px; font-size: 11px; margin-top: 14px; }
       .day-adds {
         margin-left: 28px;
         grid-template-columns: 1fr;
         gap: 8px;
       }
-      .day-add { padding: 14px; flex-direction: row; justify-content: flex-start; gap: 12px; font-size: 15px; }
+      .day-add {
+        padding: 14px 16px;
+        flex-direction: row; justify-content: flex-start;
+        gap: 12px; font-size: 15px;
+      }
       .day-add .add-ico { font-size: 22px; }
 
       .card-head { padding: 12px 14px; gap: 8px; }
@@ -658,27 +704,53 @@
 
       .type-pill { font-size: 11px; padding: 4px 10px; }
       .badge     { font-size: 11px; padding: 4px 10px; }
-      .mode-sel  { font-size: 13px; }
+      .mode-sel  { font-size: 13px; max-width: 100%; }
       .drag-handle { width: 32px; height: 32px; font-size: 18px; }
       .inp       { font-size: 16px; } /* ≥16px prevents iOS zoom */
       .label     { font-size: 12px; }
+      .inp-copy  { width: 32px; height: 32px; }
+      .inp-copy svg { width: 15px; height: 15px; }
+      .ta-wrap .inp-copy { top: 4px; right: 4px; }
 
       .brand-title { font-size: 26px; }
       .brand-meta  { font-size: 13px; }
 
-      .range-bar   { padding: 18px 14px 0; }
-      .range-picker { padding: 4px 6px; gap: 4px; flex-wrap: wrap; }
-      .range-date   { font-size: 15px; padding: 7px 12px; }
+      .range-bar   { padding: 18px 14px 0; align-items: flex-start; }
+      .range-picker { padding: 5px 6px; gap: 4px; flex-wrap: wrap; }
+      .range-date   { font-size: 15px; padding: 8px 12px; }
       .range-label  { flex: 1 1 100%; }
+      .range-arrow  { font-size: 14px; }
+
+      .unscheduled { padding: 16px; margin-top: 36px; }
+      .unscheduled-title { font-size: 12px; margin-bottom: 10px; }
+
+      /* Loader */
+      .loader-text { font-size: 14px; padding: 0 24px; text-align: center; }
+      .loader-sub  { font-size: 12px; padding: 0 24px; text-align: center; }
+
+      /* Save confirm */
+      .save-confirm-box { width: 110px; height: 110px; }
+      .save-confirm-box svg { width: 54px; height: 54px; }
+
+      /* Unsaved strip */
+      .unsaved-strip { padding: 8px 16px; font-size: 12px; gap: 8px; }
     }
 
-    @media (max-width: 380px) {
+    @media (max-width: 400px) {
+      .stage { padding: 18px 12px 120px; }
       .days::before { left: 14px; }
-      .day-header { padding-left: 50px; }
-      .day-dot { left: 4px; }
+      .day-header { padding: 12px 12px 12px 44px; }
+      .day-dot { left: 4px; width: 20px; height: 20px; }
+      .day-title { font-size: 18px; }
       .day-cards { padding-left: 22px; }
       .day-adds, .day-adds-label { margin-left: 22px; }
-      .brand-title { font-size: 24px; }
+      .brand-title { font-size: 23px; }
+      .card-head   { padding: 10px 12px; gap: 6px; }
+      .card-body   { padding: 12px; gap: 12px; }
+      .type-pill   { font-size: 10px; padding: 3px 8px; letter-spacing: .1em; }
+      .drag-handle { width: 30px; height: 30px; }
+      .inp-copy    { width: 30px; height: 30px; }
+      .btn-tiny    { padding: 6px 8px; }
     }
   </style>
 </head>
@@ -699,7 +771,6 @@
     <div class="toolbar">
       <span class="status" id="statusDot"></span>
       <button class="btn btn-ghost" id="undoBtn" onclick="undo()" disabled>↩ Undo</button>
-      <button class="btn btn-ghost" onclick="loadFromSheets()">↓ Load</button>
       <button class="btn btn-dark"  onclick="saveToSheets()">Save now</button>
     </div>
   </div>
@@ -821,6 +892,33 @@
   function autoResize(el) {
     el.style.height = 'auto';
     el.style.height = el.scrollHeight + 'px';
+  }
+
+  const ICON_COPY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>';
+  const ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
+
+  // Copy button — always rendered; CSS hides it when the sibling input is empty
+  function copyBtn() {
+    return `<button type="button" class="inp-copy" title="Copy" onclick="doCopy(this)">${ICON_COPY}</button>`;
+  }
+
+  async function doCopy(btn) {
+    const field = btn.parentElement?.querySelector('.inp');
+    const text  = field?.value || '';
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch {}
+      document.body.removeChild(ta);
+    }
+    btn.classList.add('copied');
+    btn.innerHTML = ICON_CHECK;
+    setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = ICON_COPY; }, 1200);
+    toast('Copied', 'ok');
   }
 
   function blankCard(type, date = '') {
@@ -997,12 +1095,6 @@
   }
 
   function saveToSheets() { dirty = true; clearTimeout(saveTimer); doSave(); }
-  async function loadFromSheets() {
-    if (dirty || saving) {
-      if (!confirm('You have unsaved changes. Load will overwrite them. Continue?')) return;
-    }
-    await load();
-  }
 
   function setState(s) {
     setStatusClass(s);
@@ -1275,9 +1367,12 @@
       <div class="card-body">
         <div class="field">
           <label class="label">Location</label>
-          <input class="inp" type="text" value="${x(c.location)}"
-                 placeholder="e.g. Paris"
-                 onchange="upd('${c.id}','location',this.value)" />
+          <div class="inp-row">
+            <input class="inp" type="text" value="${x(c.location)}"
+                   placeholder="e.g. Paris"
+                   onchange="upd('${c.id}','location',this.value)" />
+            ${copyBtn()}
+          </div>
         </div>
         ${c.time === undefined || c.time === null ? `
           <div class="field">
@@ -1295,15 +1390,21 @@
         `}
         <div class="field span2">
           <label class="label">Activity</label>
-          <input class="inp" type="text" value="${x(c.activity)}"
-                 placeholder="What are you doing?"
-                 onchange="upd('${c.id}','activity',this.value)" />
+          <div class="inp-row">
+            <input class="inp" type="text" value="${x(c.activity)}"
+                   placeholder="What are you doing?"
+                   onchange="upd('${c.id}','activity',this.value)" />
+            ${copyBtn()}
+          </div>
         </div>
         <div class="field span2">
           <label class="label">Notes</label>
-          <textarea class="inp" rows="2"
-                    placeholder="Links, reservations, things to remember…"
-                    onchange="upd('${c.id}','notes',this.value)">${x(c.notes)}</textarea>
+          <div class="ta-wrap">
+            <textarea class="inp" rows="2"
+                      placeholder="Links, reservations, things to remember…"
+                      onchange="upd('${c.id}','notes',this.value)">${x(c.notes)}</textarea>
+            ${copyBtn()}
+          </div>
         </div>
       </div>`;
   }
@@ -1313,15 +1414,21 @@
       <div class="card-body">
         <div class="field">
           <label class="label">From</label>
-          <input class="inp" type="text" value="${x(c.from)}"
-                 placeholder="e.g. Montevideo (MVD)"
-                 onchange="upd('${c.id}','from',this.value)" />
+          <div class="inp-row">
+            <input class="inp" type="text" value="${x(c.from)}"
+                   placeholder="e.g. Montevideo (MVD)"
+                   onchange="upd('${c.id}','from',this.value)" />
+            ${copyBtn()}
+          </div>
         </div>
         <div class="field">
           <label class="label">To</label>
-          <input class="inp" type="text" value="${x(c.to)}"
-                 placeholder="e.g. Paris (CDG)"
-                 onchange="upd('${c.id}','to',this.value)" />
+          <div class="inp-row">
+            <input class="inp" type="text" value="${x(c.to)}"
+                   placeholder="e.g. Paris (CDG)"
+                   onchange="upd('${c.id}','to',this.value)" />
+            ${copyBtn()}
+          </div>
         </div>
         <div class="field">
           <label class="label">Departure</label>
@@ -1335,21 +1442,30 @@
         </div>
         <div class="field">
           <label class="label">Reference / confirmation</label>
-          <input class="inp" type="text" value="${x(c.confirmation)}"
-                 placeholder="Your booking code"
-                 onchange="upd('${c.id}','confirmation',this.value)" />
+          <div class="inp-row">
+            <input class="inp" type="text" value="${x(c.confirmation)}"
+                   placeholder="Your booking code"
+                   onchange="upd('${c.id}','confirmation',this.value)" />
+            ${copyBtn()}
+          </div>
         </div>
         <div class="field">
           <label class="label">Reference / confirmation (partner)</label>
-          <input class="inp" type="text" value="${x(c.confirmation2)}"
-                 placeholder="Partner's booking code"
-                 onchange="upd('${c.id}','confirmation2',this.value)" />
+          <div class="inp-row">
+            <input class="inp" type="text" value="${x(c.confirmation2)}"
+                   placeholder="Partner's booking code"
+                   onchange="upd('${c.id}','confirmation2',this.value)" />
+            ${copyBtn()}
+          </div>
         </div>
         <div class="field span2">
           <label class="label">Notes</label>
-          <textarea class="inp" rows="2"
-                    placeholder="Seat, terminal, baggage, links…"
-                    onchange="upd('${c.id}','notes',this.value)">${x(c.notes)}</textarea>
+          <div class="ta-wrap">
+            <textarea class="inp" rows="2"
+                      placeholder="Seat, terminal, baggage, links…"
+                      onchange="upd('${c.id}','notes',this.value)">${x(c.notes)}</textarea>
+            ${copyBtn()}
+          </div>
         </div>
       </div>`;
   }
@@ -1359,9 +1475,12 @@
       <div class="card-body">
         <div class="field span2">
           <label class="label">Hotel name</label>
-          <input class="inp" type="text" value="${x(c.name)}"
-                 placeholder="e.g. Hotel Eiffel"
-                 onchange="upd('${c.id}','name',this.value)" />
+          <div class="inp-row">
+            <input class="inp" type="text" value="${x(c.name)}"
+                   placeholder="e.g. Hotel Eiffel"
+                   onchange="upd('${c.id}','name',this.value)" />
+            ${copyBtn()}
+          </div>
         </div>
         <div class="field">
           <label class="label">Check-in date</label>
@@ -1397,21 +1516,30 @@
         </div>
         <div class="field span2">
           <label class="label">Address</label>
-          <input class="inp" type="text" value="${x(c.address)}"
-                 placeholder="e.g. 5 Av. Anatole France, Paris"
-                 onchange="upd('${c.id}','address',this.value)" />
+          <div class="inp-row">
+            <input class="inp" type="text" value="${x(c.address)}"
+                   placeholder="e.g. 5 Av. Anatole France, Paris"
+                   onchange="upd('${c.id}','address',this.value)" />
+            ${copyBtn()}
+          </div>
         </div>
         <div class="field span2">
           <label class="label">Confirmation</label>
-          <input class="inp" type="text" value="${x(c.confirmation)}"
-                 placeholder="e.g. Booking.com · ABC123"
-                 onchange="upd('${c.id}','confirmation',this.value)" />
+          <div class="inp-row">
+            <input class="inp" type="text" value="${x(c.confirmation)}"
+                   placeholder="e.g. Booking.com · ABC123"
+                   onchange="upd('${c.id}','confirmation',this.value)" />
+            ${copyBtn()}
+          </div>
         </div>
         <div class="field span2">
           <label class="label">Notes</label>
-          <textarea class="inp" rows="2"
-                    placeholder="Room preferences, breakfast, Wi-Fi…"
-                    onchange="upd('${c.id}','notes',this.value)">${x(c.notes)}</textarea>
+          <div class="ta-wrap">
+            <textarea class="inp" rows="2"
+                      placeholder="Room preferences, breakfast, Wi-Fi…"
+                      onchange="upd('${c.id}','notes',this.value)">${x(c.notes)}</textarea>
+            ${copyBtn()}
+          </div>
         </div>
       </div>`;
   }
